@@ -217,6 +217,7 @@ import org.sonar.server.platform.ws.MigrateDbSystemWsAction;
 import org.sonar.server.platform.ws.ServerWs;
 import org.sonar.server.platform.ws.SystemInfoWsAction;
 import org.sonar.server.platform.ws.SystemRestartWsAction;
+import org.sonar.server.platform.ws.SystemStatusWsAction;
 import org.sonar.server.platform.ws.SystemWs;
 import org.sonar.server.platform.ws.UpgradesSystemWsAction;
 import org.sonar.server.plugins.InstalledPluginReferentialFactory;
@@ -557,6 +558,7 @@ class ServerComponents {
       ThreadLocalDatabaseSessionFactory.class,
 
       // Server WS
+      SystemStatusWsAction.class,
       MigrateDbSystemWsAction.class,
       SystemWs.class,
 
@@ -928,6 +930,7 @@ class ServerComponents {
       SystemInfoWsAction.class,
       UpgradesSystemWsAction.class,
       MigrateDbSystemWsAction.class,
+      SystemStatusWsAction.class,
       SystemWs.class,
       SystemMonitor.class,
       SonarQubeMonitor.class,
