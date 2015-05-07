@@ -50,9 +50,12 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class PersistMeasuresStepTest extends BaseStepTest {
+public class PersistReportMeasuresStepTest extends BaseStepTest {
 
   @Rule
   public TemporaryFolder temp = new TemporaryFolder();
@@ -62,7 +65,7 @@ public class PersistMeasuresStepTest extends BaseStepTest {
   MetricCache metricCache;
   MeasureDao measureDao;
 
-  PersistMeasuresStep sut;
+  PersistReportMeasuresStep sut;
 
   private BatchReport.Component component;
 
@@ -75,7 +78,7 @@ public class PersistMeasuresStepTest extends BaseStepTest {
     measureDao = mock(MeasureDao.class);
     when(ruleCache.get(any(RuleKey.class)).getId()).thenReturn(987);
 
-    sut = new PersistMeasuresStep(dbClient, ruleCache, metricCache);
+    sut = new PersistReportMeasuresStep(dbClient, ruleCache, metricCache);
 
     component = defaultComponent().build();
   }
