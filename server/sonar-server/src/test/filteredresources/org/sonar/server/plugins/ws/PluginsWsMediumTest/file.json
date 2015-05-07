@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    {
+      "key": "foo",
+      "release": {
+        "version": "1.0",
+      },
+      "update": {
+        "status": "COMPATIBLE",
+        "requires": []
+      }
+    }
+  ]
+}
