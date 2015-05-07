@@ -4,7 +4,12 @@
 <mapper namespace="org.sonar.core.persistence.IsAliveMapper">
 
   <select id="isAlive" resultType="int" >
-    select 1 from schema_migrations where 1 = 1 limit 1
+    select 1
+    <choose>
+      <when test="_databaseId == 'oracle'">
+        from dual
+      </when>
+    </choose>
   </select>
 
 </mapper>

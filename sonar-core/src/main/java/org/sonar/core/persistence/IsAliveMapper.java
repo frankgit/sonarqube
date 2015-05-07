@@ -22,8 +22,7 @@ package org.sonar.core.persistence;
 public interface IsAliveMapper {
   static final int IS_ALIVE_RETURNED_VALUE = 1;
   /**
-   * Always return {@link #IS_ALIVE_RETURNED_VALUE} unless a database or connection error occurs or table
-   * schema_migrations does not exist.
+   * Always return {@link #IS_ALIVE_RETURNED_VALUE} unless a database or connection error occurs.
    */
   int isAlive();
 }
