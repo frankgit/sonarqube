@@ -39,6 +39,7 @@ import org.sonar.core.properties.PropertyDto;
 import org.sonar.core.properties.PropertyQuery;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.NotFoundException;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import javax.annotation.CheckForNull;
@@ -92,7 +93,7 @@ public class ComponentAppAction implements RequestHandler {
   @Override
   public void handle(Request request, Response response) {
     String componentUuid = request.mandatoryParam(PARAM_UUID);
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
 
     JsonWriter json = response.newJsonWriter();
     json.beginObject();
@@ -211,16 +212,16 @@ public class ComponentAppAction implements RequestHandler {
       value = metric.getBestValue();
     }
     if (metricType.equals(Metric.ValueType.FLOAT) && value != null) {
-      return i18n.formatDouble(UserSession.get().locale(), value);
+      return i18n.formatDouble(userSession.locale(), value);
     }
     if (metricType.equals(Metric.ValueType.INT) && value != null) {
-      return i18n.formatInteger(UserSession.get().locale(), value.intValue());
+      return i18n.formatInteger(userSession.locale(), value.intValue());
     }
     if (metricType.equals(Metric.ValueType.PERCENT) && value != null) {
-      return i18n.formatDouble(UserSession.get().locale(), value) + "%";
+      return i18n.formatDouble(userSession.locale(), value) + "%";
     }
     if (metricType.equals(Metric.ValueType.WORK_DUR) && value != null) {
-      return durations.format(UserSession.get().locale(), durations.create(value.longValue()), Durations.DurationFormat.SHORT);
+      return durations.format(userSession.locale(), durations.create(value.longValue()), Durations.DurationFormat.SHORT);
     }
     if ((metricType.equals(Metric.ValueType.STRING) || metricType.equals(Metric.ValueType.RATING)) && data != null) {
       return data;

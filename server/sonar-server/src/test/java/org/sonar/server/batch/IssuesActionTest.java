@@ -95,7 +95,7 @@ public class IssuesActionTest {
     issueIndex = new IssueIndex(es.client(), System2.INSTANCE);
     issueIndexer = new IssueIndexer(null, es.client());
     issueAuthorizationIndexer = new IssueAuthorizationIndexer(null, es.client());
-    issuesAction = new IssuesAction(dbClient, issueIndex);
+    issuesAction = new IssuesAction(dbClient, issueIndex, userSession);
     componentDao = new ComponentDao();
 
     tester = new WsTester(new BatchWs(new BatchIndex(mock(Server.class)), issuesAction));

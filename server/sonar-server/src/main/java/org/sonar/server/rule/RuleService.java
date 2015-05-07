@@ -28,6 +28,7 @@ import org.sonar.server.rule.index.RuleNormalizer;
 import org.sonar.server.rule.index.RuleQuery;
 import org.sonar.server.search.QueryContext;
 import org.sonar.server.search.Result;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import javax.annotation.CheckForNull;
@@ -97,7 +98,7 @@ public class RuleService implements ServerComponent {
 
   public void update(RuleUpdate update) {
     checkPermission();
-    ruleUpdater.update(update, UserSession.get());
+    ruleUpdater.update(update, userSession);
   }
 
   public RuleKey create(NewRule newRule) {
@@ -111,7 +112,7 @@ public class RuleService implements ServerComponent {
   }
 
   private void checkPermission() {
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
     userSession.checkLoggedIn();
     userSession.checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
   }

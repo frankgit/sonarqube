@@ -51,7 +51,7 @@ import org.sonar.server.search.QueryContext;
 import org.sonar.server.search.Result;
 import org.sonar.server.tester.ServerTester;
 import org.sonar.server.user.MockUserSession;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.Nullable;
 
@@ -463,7 +463,7 @@ public class RegisterRulesMediumTest {
     assertThat(rule.tags()).isEmpty();
 
     // User adds tag
-    TESTER.get(RuleUpdater.class).update(RuleUpdate.createForPluginRule(RuleTesting.XOO_X1).setTags(newHashSet("tag2")), UserSession.get());
+    TESTER.get(RuleUpdater.class).update(RuleUpdate.createForPluginRule(RuleTesting.XOO_X1).setTags(newHashSet("tag2")), userSession);
     dbSession.clearCache();
     rule = ruleIndex.getByKey(RuleTesting.XOO_X1);
     assertThat(rule.systemTags()).containsOnly("tag1");

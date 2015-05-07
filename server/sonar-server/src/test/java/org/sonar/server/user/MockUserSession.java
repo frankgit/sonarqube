@@ -19,71 +19,66 @@
  */
 package org.sonar.server.user;
 
-import com.google.common.collect.HashMultimap;
-import org.sonar.core.resource.ResourceDao;
-import org.sonar.core.user.AuthorizationDao;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import javax.annotation.Nullable;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Locale;
-
 import static com.google.common.collect.Lists.newArrayList;
-import static org.mockito.Mockito.mock;
+import static com.google.common.collect.Maps.newHashMap;
 
-public class MockUserSession extends UserSession {
+public class MockUserSession extends AbstractUserSession<MockUserSession> implements UserSession {
+  private Map<String, String> projectKeyByComponentKey = newHashMap();
 
-  private final AuthorizationDao authorizationDao;
-
-  private final ResourceDao resourceDao;
-
-  private MockUserSession() {
-    globalPermissions = Collections.emptyList();
-    projectKeyByPermission = HashMultimap.create();
-    projectUuidByPermission = HashMultimap.create();
-    authorizationDao = mock(AuthorizationDao.class);
-    resourceDao = mock(ResourceDao.class);
+  public MockUserSession() {
+    super(MockUserSession.class);
+    this.globalPermissions = new ArrayList<>();
   }
 
-  public static MockUserSession set() {
-    MockUserSession session = create();
-    UserSession.set(session);
-    return session;
-  }
-
-  public static MockUserSession create() {
-    return new MockUserSession();
-  }
-
-  public MockUserSession setLocale(@Nullable Locale locale) {
-    super.setLocale(locale);
-    return this;
-  }
-
-  public MockUserSession setLogin(@Nullable String login) {
-    super.setLogin(login);
-    return this;
-  }
-
-  public MockUserSession setName(@Nullable String name) {
-    super.setName(name);
-    return this;
-  }
-
-  public MockUserSession setUserId(@Nullable Integer userId) {
-    super.setUserId(userId);
-    return this;
-  }
-
-  public MockUserSession setUserGroups(@Nullable String... userGroups) {
-    super.setUserGroups(userGroups);
-    return this;
+  public MockUserSession(MockUserSession ruleUserSession) {
+    super(MockUserSession.class);
+    this.userId = ruleUserSession.userId;
+    this.login = ruleUserSession.login;
+    this.userGroups = ruleUserSession.userGroups;
+    this.globalPermissions = ruleUserSession.globalPermissions;
+    this.projectKeyByPermission = ruleUserSession.projectKeyByPermission;
+    this.projectUuidByPermission = ruleUserSession.projectUuidByPermission;
+    this.projectUuidByComponentUuid = ruleUserSession.projectUuidByComponentUuid;
+    this.projectPermissions = ruleUserSession.projectPermissions;
+    this.name = ruleUserSession.name;
+    this.locale = ruleUserSession.locale;
   }
 
   public MockUserSession setGlobalPermissions(String... globalPermissions) {
     this.globalPermissions = Arrays.asList(globalPermissions);
     return this;
+  }
+
+  @Override
+  public MockUserSession setLogin(@Nullable String s) {
+    return super.setLogin(s);
+  }
+
+  @Override
+  public MockUserSession setName(@Nullable String s) {
+    return super.setName(s);
+  }
+
+  @Override
+  public MockUserSession setUserId(@Nullable Integer userId) {
+    return super.setUserId(userId);
+  }
+
+  @Override
+  public MockUserSession setUserGroups(@Nullable String... userGroups) {
+    return super.setUserGroups(userGroups);
+  }
+
+  @Override
+  public MockUserSession setLocale(@Nullable Locale l) {
+    return super.setLocale(l);
   }
 
   /**
@@ -119,12 +114,29 @@ public class MockUserSession extends UserSession {
   }
 
   @Override
-  AuthorizationDao authorizationDao() {
-    return authorizationDao;
+  public List<String> globalPermissions() {
+    return globalPermissions;
   }
 
   @Override
-  ResourceDao resourceDao() {
-    return resourceDao;
+  public boolean hasProjectPermission(String permission, String projectKey) {
+    return projectPermissions.contains(permission) && projectKeyByPermission.get(permission).contains(projectKey);
+  }
+
+  @Override
+  public boolean hasProjectPermissionByUuid(String permission, String projectUuid) {
+    return projectPermissions.contains(permission) && projectUuidByPermission.get(permission).contains(projectUuid);
+  }
+
+  @Override
+  public boolean hasComponentPermission(String permission, String componentKey) {
+    String projectKey = projectKeyByComponentKey.get(componentKey);
+    return projectKey != null && hasProjectPermission(permission, projectKey);
+  }
+
+  @Override
+  public boolean hasComponentUuidPermission(String permission, String componentUuid) {
+    String projectUuid = projectUuidByComponentUuid.get(componentUuid);
+    return projectUuid != null && hasProjectPermissionByUuid(permission, projectUuid);
   }
 }

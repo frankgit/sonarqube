@@ -45,6 +45,7 @@ import org.sonar.core.properties.PropertyQuery;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.ui.ViewProxy;
 import org.sonar.server.ui.Views;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import javax.annotation.Nullable;
@@ -102,7 +103,7 @@ public class ComponentNavigationAction implements NavigationAction {
   public void handle(Request request, Response response) throws Exception {
     String componentKey = request.mandatoryParam(PARAM_COMPONENT_KEY);
 
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
     DbSession session = dbClient.openSession(false);
 
     try {

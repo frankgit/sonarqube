@@ -46,9 +46,9 @@ public class UserSessionTest {
 
   @Test
   public void getSession_get_anonymous_by_default() throws Exception {
-    UserSession.remove();
+    ThreadLocalUserSession.remove();
 
-    UserSession session = UserSession.get();
+    UserSession session = userSession;
 
     assertThat(session).isNotNull();
     assertThat(session.login()).isNull();
@@ -60,9 +60,9 @@ public class UserSessionTest {
 
   @Test
   public void get_session() throws Exception {
-    UserSession.set(new UserSession().setUserId(123).setLogin("karadoc").setLocale(Locale.FRENCH));
+    ThreadLocalUserSession.set(new ThreadLocalUserSession().setUserId(123).setLogin("karadoc").setLocale(Locale.FRENCH));
 
-    UserSession session = UserSession.get();
+    UserSession session = userSession;
     assertThat(session).isNotNull();
     assertThat(session.userId()).isEqualTo(123);
     assertThat(session.login()).isEqualTo("karadoc");
@@ -72,7 +72,7 @@ public class UserSessionTest {
 
   @Test
   public void login_should_not_be_empty() throws Exception {
-    UserSession session = new UserSession().setLogin("");
+    UserSession session = new ThreadLocalUserSession().setLogin("");
     assertThat(session.login()).isNull();
     assertThat(session.isLoggedIn()).isFalse();
   }
@@ -261,15 +261,17 @@ public class UserSessionTest {
     session.checkComponentPermission(UserRole.USER, "another");
   }
 
-  static class SpyUserSession extends UserSession {
+  static class SpyUserSession extends ThreadLocalUserSession {
     private AuthorizationDao authorizationDao;
     private ResourceDao resourceDao;
 
     SpyUserSession(String login, AuthorizationDao authorizationDao) {
+      super();
       this(login, authorizationDao, null);
     }
 
     SpyUserSession(String login, AuthorizationDao authorizationDao, @Nullable ResourceDao resourceDao) {
+      super();
       this.authorizationDao = authorizationDao;
       this.resourceDao = resourceDao;
       setLogin(login);

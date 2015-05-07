@@ -21,7 +21,11 @@ package org.sonar.server.qualitygate;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -51,21 +55,23 @@ import org.sonar.server.exceptions.ForbiddenException;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.user.MockUserSession;
 import org.sonar.server.user.UserSession;
-import org.sonar.server.user.UserSessionTestUtils;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import org.sonar.server.tester.UserSessionRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QualityGatesTest {
+
+  @Rule
+  public UserSessionRule userSessionRule = new UserSessionRule();
 
   @Mock
   DbSession session;
@@ -92,18 +98,18 @@ public class QualityGatesTest {
 
   static final String PROJECT_KEY = "SonarQube";
 
-  UserSession authorizedProfileAdminUserSession = MockUserSession.create().setLogin("gaudol").setName("Olivier").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
-  UserSession authorizedProjectAdminUserSession = MockUserSession.create().setLogin("gaudol").setName("Olivier").addProjectPermissions(UserRole.ADMIN, PROJECT_KEY);
-  UserSession unauthorizedUserSession = MockUserSession.create().setLogin("polop").setName("Polop");
-  UserSession unauthenticatedUserSession = MockUserSession.create();
+  UserSession authorizedProfileAdminUserSession = new MockUserSession().setLogin("gaudol").setName("Olivier").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  UserSession authorizedProjectAdminUserSession = new MockUserSession().setLogin("gaudol").setName("Olivier").addProjectPermissions(UserRole.ADMIN, PROJECT_KEY);
+  UserSession unauthorizedUserSession = new MockUserSession().setLogin("polop").setName("Polop");
+  UserSession unauthenticatedUserSession = new MockUserSession();
 
   @Before
   public void initialize() {
     when(componentDao.getById(anyLong(), eq(session))).thenReturn(new ComponentDto().setId(1L).setKey(PROJECT_KEY));
 
     when(myBatis.openSession(false)).thenReturn(session);
-    qGates = new QualityGates(dao, conditionDao, metricFinder, propertiesDao, componentDao, myBatis);
-    UserSessionTestUtils.setUserSession(authorizedProfileAdminUserSession);
+    qGates = new QualityGates(dao, conditionDao, metricFinder, propertiesDao, componentDao, myBatis, userSessionRule);
+    userSessionRule.set(authorizedProfileAdminUserSession);
   }
 
   @Test
@@ -125,14 +131,14 @@ public class QualityGatesTest {
 
   @Test(expected = ForbiddenException.class)
   public void should_fail_create_on_anonymous() throws Exception {
-    UserSessionTestUtils.setUserSession(unauthenticatedUserSession);
+    userSessionRule.set(unauthenticatedUserSession);
     assertThat(qGates.currentUserHasWritePermission()).isFalse();
     qGates.create("polop");
   }
 
   @Test(expected = ForbiddenException.class)
   public void should_fail_create_on_missing_permission() throws Exception {
-    UserSessionTestUtils.setUserSession(unauthorizedUserSession);
+    userSessionRule.set(unauthorizedUserSession);
     qGates.create("polop");
   }
 
@@ -525,7 +531,7 @@ public class QualityGatesTest {
 
   @Test
   public void associate_project_with_project_admin_permission() {
-    UserSessionTestUtils.setUserSession(authorizedProjectAdminUserSession);
+    userSessionRule.set(authorizedProjectAdminUserSession);
 
     Long qGateId = 42L;
     Long projectId = 24L;
@@ -552,7 +558,7 @@ public class QualityGatesTest {
 
   @Test
   public void dissociate_project_with_project_admin_permission() {
-    UserSessionTestUtils.setUserSession(authorizedProjectAdminUserSession);
+    userSessionRule.set(authorizedProjectAdminUserSession);
 
     Long qGateId = 42L;
     Long projectId = 24L;

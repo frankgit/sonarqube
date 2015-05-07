@@ -31,7 +31,7 @@ import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.core.qualityprofile.db.QualityProfileDto;
 import org.sonar.server.qualityprofile.BulkChangeResult;
 import org.sonar.server.qualityprofile.QProfileBackuper;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -63,7 +63,7 @@ public class QProfileRestoreAction implements BaseQProfileWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+    userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
     InputStream backup = request.paramAsInputStream(PARAM_BACKUP);
     InputStreamReader reader = null;
 

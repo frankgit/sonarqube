@@ -39,7 +39,7 @@ import org.sonar.core.qualityprofile.db.QualityProfileDto;
 import org.sonar.server.qualityprofile.QProfileLoader;
 import org.sonar.server.rule.RuleRepositories;
 import org.sonar.server.rule.RuleRepositories.Repository;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -80,7 +80,7 @@ public class AppAction implements RulesAction {
   }
 
   private void addPermissions(JsonWriter json) {
-    json.prop("canWrite", UserSession.get().hasGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+    json.prop("canWrite", userSession.hasGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN));
   }
 
   private void addProfiles(JsonWriter json) {

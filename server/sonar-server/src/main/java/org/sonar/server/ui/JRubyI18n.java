@@ -25,7 +25,7 @@ import org.sonar.api.ServerComponent;
 import org.sonar.api.i18n.I18n;
 import org.sonar.api.utils.Duration;
 import org.sonar.api.utils.Durations;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.Nullable;
 
@@ -82,11 +82,11 @@ public class JRubyI18n implements ServerComponent {
   }
 
   public String ageFromNow(Date date) {
-    return i18n.ageFromNow(UserSession.get().locale(), date);
+    return i18n.ageFromNow(userSession.locale(), date);
   }
 
   public String formatDuration(Duration duration, String format) {
-    return durations.format(UserSession.get().locale(), duration, Durations.DurationFormat.valueOf(format));
+    return durations.format(userSession.locale(), duration, Durations.DurationFormat.valueOf(format));
   }
 
   public String formatLongDuration(long duration, String format) {
@@ -94,7 +94,7 @@ public class JRubyI18n implements ServerComponent {
   }
 
   public String formatDateTime(Date date) {
-    return i18n.formatDateTime(UserSession.get().locale(), date);
+    return i18n.formatDateTime(userSession.locale(), date);
   }
 
 }

@@ -29,6 +29,7 @@ import org.sonar.api.issue.Issue;
 import org.sonar.api.issue.internal.DefaultIssue;
 import org.sonar.core.issue.workflow.IssueWorkflow;
 import org.sonar.core.issue.workflow.Transition;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import java.util.Collection;
@@ -63,7 +64,7 @@ public class TransitionAction extends Action implements ServerComponent {
 
   private boolean canExecuteTransition(Issue issue, final String transition) {
     final DefaultIssue defaultIssue = (DefaultIssue) issue;
-    final UserSession userSession = UserSession.get();
+    final UserSession userSession = userSession;
     return Iterables.find(workflow.outTransitions(issue), new Predicate<Transition>() {
       @Override
       public boolean apply(Transition input) {

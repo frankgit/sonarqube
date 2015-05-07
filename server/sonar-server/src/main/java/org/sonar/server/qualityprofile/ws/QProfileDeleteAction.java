@@ -28,7 +28,7 @@ import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.core.persistence.DbSession;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.qualityprofile.QProfileFactory;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 public class QProfileDeleteAction implements BaseQProfileWsAction {
 
@@ -56,8 +56,8 @@ public class QProfileDeleteAction implements BaseQProfileWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkLoggedIn();
-    UserSession.get().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+    userSession.checkLoggedIn();
+    userSession.checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
 
 
     DbSession session = dbClient.openSession(false);

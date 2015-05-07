@@ -25,7 +25,7 @@ import org.sonar.api.issue.internal.FieldDiffs;
 import org.sonar.api.utils.Duration;
 import org.sonar.api.utils.Durations;
 import org.sonar.core.issue.IssueUpdater;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.io.Serializable;
 import java.util.List;
@@ -75,10 +75,10 @@ public class IssueChangelogFormatter implements ServerComponent {
     String oldValueString = oldValue != null && !"".equals(oldValue) ? oldValue.toString() : null;
     if (IssueUpdater.TECHNICAL_DEBT.equals(key)) {
       if (newValueString != null) {
-        newValueString = durations.format(UserSession.get().locale(), Duration.create(Long.parseLong(newValueString)), Durations.DurationFormat.SHORT);
+        newValueString = durations.format(userSession.locale(), Duration.create(Long.parseLong(newValueString)), Durations.DurationFormat.SHORT);
       }
       if (oldValueString != null) {
-        oldValueString = durations.format(UserSession.get().locale(), Duration.create(Long.parseLong(oldValueString)), Durations.DurationFormat.SHORT);
+        oldValueString = durations.format(userSession.locale(), Duration.create(Long.parseLong(oldValueString)), Durations.DurationFormat.SHORT);
       }
     }
     return new IssueChangelogDiffFormat(oldValueString, newValueString);

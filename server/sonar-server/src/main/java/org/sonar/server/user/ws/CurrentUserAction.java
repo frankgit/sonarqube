@@ -23,6 +23,7 @@ import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService.NewController;
 import org.sonar.api.utils.text.JsonWriter;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 public class CurrentUserAction implements BaseUsersWsAction {
@@ -39,7 +40,7 @@ public class CurrentUserAction implements BaseUsersWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession session = UserSession.get();
+    UserSession session = userSession;
     JsonWriter json = response.newJsonWriter().beginObject();
 
     writeUserDetails(json, session);

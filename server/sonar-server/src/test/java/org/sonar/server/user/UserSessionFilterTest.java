@@ -26,7 +26,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -37,7 +36,7 @@ public class UserSessionFilterTest {
   @Before
   public void setUp() {
     // for test isolation
-    UserSession.remove();
+    ThreadLocalUserSession.remove();
   }
 
   @Test
@@ -47,12 +46,12 @@ public class UserSessionFilterTest {
     FilterChain chain = mock(FilterChain.class);
 
     MockUserSession.set().setUserId(123).setLogin("karadoc");
-    assertThat(UserSession.hasSession()).isTrue();
+    assertThat(ThreadLocalUserSession.hasSession()).isTrue();
     UserSessionFilter filter = new UserSessionFilter();
     filter.doFilter(httpRequest, httpResponse, chain);
 
     verify(chain).doFilter(httpRequest, httpResponse);
-    assertThat(UserSession.hasSession()).isFalse();
+    assertThat(ThreadLocalUserSession.hasSession()).isFalse();
   }
 
   @Test

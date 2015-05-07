@@ -38,7 +38,7 @@ import org.sonar.server.es.SearchResult;
 import org.sonar.server.test.index.CoveredFileDoc;
 import org.sonar.server.test.index.TestDoc;
 import org.sonar.server.test.index.TestIndex;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.Nullable;
 
@@ -200,7 +200,7 @@ public class TestsListAction implements TestAction {
   }
 
   private SearchResult<TestDoc> searchTestsByTestFileKey(DbSession dbSession, String testFileKey, SearchOptions searchOptions) {
-    UserSession.get().checkComponentPermission(UserRole.CODEVIEWER, testFileKey);
+    userSession.checkComponentPermission(UserRole.CODEVIEWER, testFileKey);
     ComponentDto testFile = dbClient.componentDao().getByKey(dbSession, testFileKey);
 
     return testIndex.searchByTestFileUuid(testFile.uuid(), searchOptions);
@@ -218,6 +218,6 @@ public class TestsListAction implements TestAction {
 
   private void checkComponentUuidPermission(DbSession dbSession, String componentUuid) {
     ComponentDto component = dbClient.componentDao().getByUuid(dbSession, componentUuid);
-    UserSession.get().checkProjectUuidPermission(UserRole.CODEVIEWER, component.projectUuid());
+    userSession.checkProjectUuidPermission(UserRole.CODEVIEWER, component.projectUuid());
   }
 }

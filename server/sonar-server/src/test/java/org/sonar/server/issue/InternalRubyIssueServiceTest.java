@@ -41,7 +41,7 @@ import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.Message;
 import org.sonar.server.issue.actionplan.ActionPlanService;
 import org.sonar.server.issue.filter.IssueFilterService;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -168,7 +168,7 @@ public class InternalRubyIssueServiceTest {
     assertThat(result.ok()).isTrue();
 
     ArgumentCaptor<ActionPlan> actionPlanCaptor = ArgumentCaptor.forClass(ActionPlan.class);
-    verify(actionPlanService).create(actionPlanCaptor.capture(), any(UserSession.class));
+    verify(actionPlanService).create(actionPlanCaptor.capture(), any(ThreadLocalUserSession.class));
     ActionPlan actionPlan = actionPlanCaptor.getValue();
 
     assertThat(actionPlan).isNotNull();
@@ -180,7 +180,7 @@ public class InternalRubyIssueServiceTest {
 
   @Test
   public void update_action_plan() {
-    when(actionPlanService.findByKey(eq("ABCD"), any(UserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
+    when(actionPlanService.findByKey(eq("ABCD"), any(ThreadLocalUserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
 
     Map<String, String> parameters = newHashMap();
     parameters.put("name", "New Long term");
@@ -192,7 +192,7 @@ public class InternalRubyIssueServiceTest {
     assertThat(result.ok()).isTrue();
 
     ArgumentCaptor<ActionPlan> actionPlanCaptor = ArgumentCaptor.forClass(ActionPlan.class);
-    verify(actionPlanService).update(actionPlanCaptor.capture(), any(UserSession.class));
+    verify(actionPlanService).update(actionPlanCaptor.capture(), any(ThreadLocalUserSession.class));
     ActionPlan actionPlan = actionPlanCaptor.getValue();
 
     assertThat(actionPlan).isNotNull();
@@ -204,7 +204,7 @@ public class InternalRubyIssueServiceTest {
 
   @Test
   public void update_action_plan_with_new_project() {
-    when(actionPlanService.findByKey(eq("ABCD"), any(UserSession.class))).thenReturn(DefaultActionPlan.create("Long term").setProjectKey("org.sonar.MultiSample"));
+    when(actionPlanService.findByKey(eq("ABCD"), any(ThreadLocalUserSession.class))).thenReturn(DefaultActionPlan.create("Long term").setProjectKey("org.sonar.MultiSample"));
 
     Map<String, String> parameters = newHashMap();
     parameters.put("name", "New Long term");
@@ -215,7 +215,7 @@ public class InternalRubyIssueServiceTest {
     Result result = service.updateActionPlan("ABCD", parameters);
     assertThat(result.ok()).isTrue();
 
-    verify(actionPlanService).update(actionPlanCaptor.capture(), any(UserSession.class));
+    verify(actionPlanService).update(actionPlanCaptor.capture(), any(ThreadLocalUserSession.class));
     ActionPlan actionPlan = actionPlanCaptor.getValue();
 
     assertThat(actionPlan).isNotNull();
@@ -228,7 +228,7 @@ public class InternalRubyIssueServiceTest {
 
   @Test
   public void not_update_action_plan_when_action_plan_is_not_found() {
-    when(actionPlanService.findByKey(eq("ABCD"), any(UserSession.class))).thenReturn(null);
+    when(actionPlanService.findByKey(eq("ABCD"), any(ThreadLocalUserSession.class))).thenReturn(null);
 
     Result result = service.updateActionPlan("ABCD", null);
     assertThat(result.ok()).isFalse();
@@ -237,38 +237,38 @@ public class InternalRubyIssueServiceTest {
 
   @Test
   public void delete_action_plan() {
-    when(actionPlanService.findByKey(eq("ABCD"), any(UserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
+    when(actionPlanService.findByKey(eq("ABCD"), any(ThreadLocalUserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
 
     Result result = service.deleteActionPlan("ABCD");
-    verify(actionPlanService).delete(eq("ABCD"), any(UserSession.class));
+    verify(actionPlanService).delete(eq("ABCD"), any(ThreadLocalUserSession.class));
     assertThat(result.ok()).isTrue();
   }
 
   @Test
   public void not_delete_action_plan_if_action_plan_not_found() {
-    when(actionPlanService.findByKey(eq("ABCD"), any(UserSession.class))).thenReturn(null);
+    when(actionPlanService.findByKey(eq("ABCD"), any(ThreadLocalUserSession.class))).thenReturn(null);
 
     Result result = service.deleteActionPlan("ABCD");
-    verify(actionPlanService, never()).delete(eq("ABCD"), any(UserSession.class));
+    verify(actionPlanService, never()).delete(eq("ABCD"), any(ThreadLocalUserSession.class));
     assertThat(result.ok()).isFalse();
     assertThat(result.errors()).contains(Result.Message.ofL10n("action_plans.errors.action_plan_does_not_exist", "ABCD"));
   }
 
   @Test
   public void close_action_plan() {
-    when(actionPlanService.findByKey(eq("ABCD"), any(UserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
+    when(actionPlanService.findByKey(eq("ABCD"), any(ThreadLocalUserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
 
     Result result = service.closeActionPlan("ABCD");
-    verify(actionPlanService).setStatus(eq("ABCD"), eq("CLOSED"), any(UserSession.class));
+    verify(actionPlanService).setStatus(eq("ABCD"), eq("CLOSED"), any(ThreadLocalUserSession.class));
     assertThat(result.ok()).isTrue();
   }
 
   @Test
   public void open_action_plan() {
-    when(actionPlanService.findByKey(eq("ABCD"), any(UserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
+    when(actionPlanService.findByKey(eq("ABCD"), any(ThreadLocalUserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
 
     Result result = service.openActionPlan("ABCD");
-    verify(actionPlanService).setStatus(eq("ABCD"), eq("OPEN"), any(UserSession.class));
+    verify(actionPlanService).setStatus(eq("ABCD"), eq("OPEN"), any(ThreadLocalUserSession.class));
     assertThat(result.ok()).isTrue();
   }
 
@@ -404,7 +404,7 @@ public class InternalRubyIssueServiceTest {
     service.createIssueFilter(parameters);
 
     ArgumentCaptor<IssueFilterDto> issueFilterCaptor = ArgumentCaptor.forClass(IssueFilterDto.class);
-    verify(issueFilterService).save(issueFilterCaptor.capture(), any(UserSession.class));
+    verify(issueFilterService).save(issueFilterCaptor.capture(), any(ThreadLocalUserSession.class));
     IssueFilterDto issueFilter = issueFilterCaptor.getValue();
     assertThat(issueFilter.getName()).isEqualTo("Long term");
     assertThat(issueFilter.getDescription()).isEqualTo("Long term issues");
@@ -421,7 +421,7 @@ public class InternalRubyIssueServiceTest {
     service.updateIssueFilter(parameters);
 
     ArgumentCaptor<IssueFilterDto> issueFilterCaptor = ArgumentCaptor.forClass(IssueFilterDto.class);
-    verify(issueFilterService).update(issueFilterCaptor.capture(), any(UserSession.class));
+    verify(issueFilterService).update(issueFilterCaptor.capture(), any(ThreadLocalUserSession.class));
     IssueFilterDto issueFilter = issueFilterCaptor.getValue();
     assertThat(issueFilter.getId()).isEqualTo(10L);
     assertThat(issueFilter.getName()).isEqualTo("Long term");
@@ -432,13 +432,13 @@ public class InternalRubyIssueServiceTest {
   public void update_data() {
     Map<String, Object> data = newHashMap();
     service.updateIssueFilterQuery(10L, data);
-    verify(issueFilterService).updateFilterQuery(eq(10L), eq(data), any(UserSession.class));
+    verify(issueFilterService).updateFilterQuery(eq(10L), eq(data), any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void delete_issue_filter() {
     service.deleteIssueFilter(1L);
-    verify(issueFilterService).delete(eq(1L), any(UserSession.class));
+    verify(issueFilterService).delete(eq(1L), any(ThreadLocalUserSession.class));
   }
 
   @Test
@@ -450,7 +450,7 @@ public class InternalRubyIssueServiceTest {
     service.copyIssueFilter(1L, parameters);
 
     ArgumentCaptor<IssueFilterDto> issueFilterCaptor = ArgumentCaptor.forClass(IssueFilterDto.class);
-    verify(issueFilterService).copy(eq(1L), issueFilterCaptor.capture(), any(UserSession.class));
+    verify(issueFilterService).copy(eq(1L), issueFilterCaptor.capture(), any(ThreadLocalUserSession.class));
     IssueFilterDto issueFilter = issueFilterCaptor.getValue();
     assertThat(issueFilter.getName()).isEqualTo("Copy of Long term");
     assertThat(issueFilter.getDescription()).isEqualTo("Copy of Long term issues");
@@ -578,7 +578,7 @@ public class InternalRubyIssueServiceTest {
     ArgumentCaptor<SearchOptions> contextArgumentCaptor = ArgumentCaptor.forClass(SearchOptions.class);
 
     verify(issueFilterService).execute(issueQueryArgumentCaptor.capture(), contextArgumentCaptor.capture());
-    verify(issueFilterService).find(eq(10L), any(UserSession.class));
+    verify(issueFilterService).find(eq(10L), any(ThreadLocalUserSession.class));
 
     SearchOptions searchOptions = contextArgumentCaptor.getValue();
     assertThat(searchOptions.getLimit()).isEqualTo(20);
@@ -613,39 +613,39 @@ public class InternalRubyIssueServiceTest {
   @Test
   public void find_user_issue_filters() {
     service.findIssueFiltersForCurrentUser();
-    verify(issueFilterService).findByUser(any(UserSession.class));
+    verify(issueFilterService).findByUser(any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void find_shared_issue_filters() {
     service.findSharedFiltersForCurrentUser();
-    verify(issueFilterService).findSharedFiltersWithoutUserFilters(any(UserSession.class));
+    verify(issueFilterService).findSharedFiltersWithoutUserFilters(any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void find_favourite_issue_filters() {
     service.findFavouriteIssueFiltersForCurrentUser();
-    verify(issueFilterService).findFavoriteFilters(any(UserSession.class));
+    verify(issueFilterService).findFavoriteFilters(any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void toggle_favourite_issue_filter() {
     service.toggleFavouriteIssueFilter(10L);
-    verify(issueFilterService).toggleFavouriteIssueFilter(eq(10L), any(UserSession.class));
+    verify(issueFilterService).toggleFavouriteIssueFilter(eq(10L), any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void check_if_user_is_authorized_to_see_issue_filter() {
     IssueFilterDto issueFilter = new IssueFilterDto();
     service.isUserAuthorized(issueFilter);
-    verify(issueFilterService).getLoggedLogin(any(UserSession.class));
+    verify(issueFilterService).getLoggedLogin(any(ThreadLocalUserSession.class));
     verify(issueFilterService).verifyCurrentUserCanReadFilter(eq(issueFilter), anyString());
   }
 
   @Test
   public void check_if_user_can_share_issue_filter() {
     service.canUserShareIssueFilter();
-    verify(issueFilterService).canShareFilter(any(UserSession.class));
+    verify(issueFilterService).canShareFilter(any(ThreadLocalUserSession.class));
   }
 
   @Test
@@ -658,7 +658,7 @@ public class InternalRubyIssueServiceTest {
     params.put("set_severity.severity", "MINOR");
     params.put("plan.plan", "3.7");
     service.bulkChange(params, "My comment", true);
-    verify(issueBulkChangeService).execute(any(IssueBulkChangeQuery.class), any(UserSession.class));
+    verify(issueBulkChangeService).execute(any(IssueBulkChangeQuery.class), any(ThreadLocalUserSession.class));
   }
 
   @Test

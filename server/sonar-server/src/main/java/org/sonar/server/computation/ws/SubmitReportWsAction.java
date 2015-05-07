@@ -28,7 +28,7 @@ import org.sonar.api.server.ws.WebService;
 import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.server.computation.ComputationThreadLauncher;
 import org.sonar.server.computation.ReportQueue;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.io.InputStream;
 
@@ -68,7 +68,7 @@ public class SubmitReportWsAction implements ComputationWsAction, RequestHandler
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+    userSession.checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
     String projectKey = request.mandatoryParam(PARAM_PROJECT_KEY);
     InputStream reportData = request.paramAsInputStream(PARAM_REPORT_DATA);
     try {

@@ -32,7 +32,7 @@ import org.sonar.core.user.GroupDto;
 import org.sonar.core.user.UserDao;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.NotFoundException;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -155,7 +155,7 @@ public class InternalPermissionTemplateService implements ServerComponent {
   }
 
   public void removeGroupFromTemplates(String groupName) {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
     DbSession session = myBatis.openSession(false);
     try {
       GroupDto group = userDao.selectGroupByName(groupName, session);

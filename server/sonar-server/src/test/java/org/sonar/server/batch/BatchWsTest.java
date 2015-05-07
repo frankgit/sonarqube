@@ -59,7 +59,7 @@ public class BatchWsTest {
     tester = new WsTester(new BatchWs(batchIndex,
       new GlobalRepositoryAction(mock(DbClient.class), mock(PropertiesDao.class)),
       new ProjectRepositoryAction(mock(ProjectRepositoryLoader.class)),
-      new IssuesAction(mock(DbClient.class), mock(IssueIndex.class))));
+      new IssuesAction(mock(DbClient.class), mock(IssueIndex.class), userSession)));
   }
 
   @Test

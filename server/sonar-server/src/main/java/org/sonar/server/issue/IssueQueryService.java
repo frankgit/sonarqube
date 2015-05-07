@@ -42,7 +42,7 @@ import org.sonar.server.component.ComponentService;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.issue.filter.IssueFilterParameters;
 import org.sonar.server.search.ws.SearchRequestHandler;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.util.RubyUtils;
 
 import javax.annotation.CheckForNull;
@@ -203,7 +203,7 @@ public class IssueQueryService implements ServerComponent {
       assignees.addAll(assigneesFromParams);
     }
     if (assignees.contains(LOGIN_MYSELF)) {
-      String login = UserSession.get().login();
+      String login = userSession.login();
       if (login == null) {
         assignees.add(UNKNOWN);
       } else {
@@ -328,8 +328,8 @@ public class IssueQueryService implements ServerComponent {
   private void addViewsOrSubViews(IssueQuery.Builder builder, Collection<String> componentUuids, String uniqueQualifier) {
     List<String> filteredViewUuids = newArrayList();
     for (String viewUuid : componentUuids) {
-      if ((Qualifiers.VIEW.equals(uniqueQualifier) && UserSession.get().hasProjectPermissionByUuid(UserRole.USER, viewUuid))
-        || (Qualifiers.SUBVIEW.equals(uniqueQualifier) && UserSession.get().hasComponentUuidPermission(UserRole.USER, viewUuid))) {
+      if ((Qualifiers.VIEW.equals(uniqueQualifier) && userSession.hasProjectPermissionByUuid(UserRole.USER, viewUuid))
+        || (Qualifiers.SUBVIEW.equals(uniqueQualifier) && userSession.hasComponentUuidPermission(UserRole.USER, viewUuid))) {
         filteredViewUuids.add(viewUuid);
       }
     }

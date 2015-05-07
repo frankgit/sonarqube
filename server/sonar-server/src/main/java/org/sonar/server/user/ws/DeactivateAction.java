@@ -26,7 +26,7 @@ import org.sonar.api.server.ws.WebService;
 import org.sonar.api.server.ws.WebService.NewAction;
 import org.sonar.api.utils.text.JsonWriter;
 import org.sonar.core.permission.GlobalPermissions;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserUpdater;
 import org.sonar.server.user.index.UserDoc;
 import org.sonar.server.user.index.UserIndex;
@@ -59,7 +59,7 @@ public class DeactivateAction implements BaseUsersWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
 
     String login = request.mandatoryParam(PARAM_LOGIN);
     userUpdater.deactivateUserByLogin(login);

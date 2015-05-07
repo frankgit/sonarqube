@@ -26,6 +26,7 @@ import org.sonar.api.server.ws.WebService;
 import org.sonar.batch.protocol.input.BatchInput;
 import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.server.plugins.MimeTypes;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 import org.sonar.server.user.index.UserDoc;
 import org.sonar.server.user.index.UserIndex;
@@ -40,6 +41,7 @@ public class UsersAction implements BatchAction {
   private static final String PARAM_LOGINS = "logins";
 
   private final UserIndex userIndex;
+  private final UserSession userSession;
 
   public UsersAction(UserIndex userIndex) {
     this.userIndex = userIndex;
@@ -62,7 +64,7 @@ public class UsersAction implements BatchAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.PREVIEW_EXECUTION);
+    userSession.checkGlobalPermission(GlobalPermissions.PREVIEW_EXECUTION);
     List<String> logins = request.mandatoryParamAsStrings(PARAM_LOGINS);
 
     response.stream().setMediaType(MimeTypes.PROTOBUF);

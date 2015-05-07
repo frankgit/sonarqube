@@ -31,7 +31,7 @@ public class RubyUserSessionTest {
   public void should_set_session() throws Exception {
     RubyUserSession.setSession(123, "karadoc", "Karadoc", newArrayList("sonar-users"), "fr");
 
-    UserSession session = UserSession.get();
+    UserSession session = userSession;
 
     assertThat(session).isNotNull();
     assertThat(session.login()).isEqualTo("karadoc");
@@ -46,7 +46,7 @@ public class RubyUserSessionTest {
   public void should_set_anonymous_session() throws Exception {
     RubyUserSession.setSession(null, null, null, null, "fr");
 
-    UserSession session = UserSession.get();
+    UserSession session = userSession;
 
     assertThat(session).isNotNull();
     assertThat(session.login()).isNull();

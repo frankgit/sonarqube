@@ -34,7 +34,7 @@ import org.sonar.server.paging.PagedResult;
 import org.sonar.server.rule.index.RuleQuery;
 import org.sonar.server.search.QueryContext;
 import org.sonar.server.search.Result;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.HashMap;
 import java.util.List;
@@ -162,7 +162,7 @@ public class RubyRuleServiceTest {
 
     service.updateRule(ImmutableMap.<String, Object>of("ruleKey", "squid:S001"));
 
-    verify(updater).update(any(RuleUpdate.class), any(UserSession.class));
+    verify(updater).update(any(RuleUpdate.class), any(ThreadLocalUserSession.class));
   }
 
   @Test

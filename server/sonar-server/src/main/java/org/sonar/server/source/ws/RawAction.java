@@ -31,7 +31,7 @@ import org.sonar.core.component.ComponentDto;
 import org.sonar.core.persistence.DbSession;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.source.SourceService;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.io.IOException;
 import java.util.List;
@@ -64,7 +64,7 @@ public class RawAction implements SourcesAction {
   @Override
   public void handle(Request request, Response response) {
     String fileKey = request.mandatoryParam("key");
-    UserSession.get().checkComponentPermission(UserRole.CODEVIEWER, fileKey);
+    userSession.checkComponentPermission(UserRole.CODEVIEWER, fileKey);
     try (DbSession session = dbClient.openSession(false)) {
       ComponentDto componentDto = dbClient.componentDao().getByKey(session, fileKey);
       List<String> lines = sourceService.getLinesAsTxt(componentDto.uuid(), null, null);

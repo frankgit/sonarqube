@@ -29,6 +29,7 @@ import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.qualityprofile.QProfile;
 import org.sonar.server.qualityprofile.QProfileLookup;
 import org.sonar.server.qualityprofile.QProfileProjectOperations;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -129,7 +130,7 @@ public class ProjectAssociationActions implements ServerComponent {
         projectUuid = componentService.getByKey(projectKey).uuid();
       }
 
-      changeAssociation(profileKey, projectUuid, UserSession.get());
+      changeAssociation(profileKey, projectUuid, userSession);
       response.noContent();
     }
 

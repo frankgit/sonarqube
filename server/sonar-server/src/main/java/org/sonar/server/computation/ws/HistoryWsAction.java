@@ -33,7 +33,7 @@ import org.sonar.server.activity.index.ActivityQuery;
 import org.sonar.server.es.SearchOptions;
 import org.sonar.server.es.SearchResult;
 import org.sonar.server.issue.ws.IssuesWs;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class HistoryWsAction implements ComputationWsAction, RequestHandler {
 
   @Override
   public void handle(Request request, Response response) {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
 
     ActivityQuery query = new ActivityQuery();
     query.setTypes(Arrays.asList(Activity.Type.ANALYSIS_REPORT.name()));

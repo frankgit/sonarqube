@@ -30,7 +30,7 @@ import org.sonar.core.component.ComponentDto;
 import org.sonar.core.design.FileDependencyDto;
 import org.sonar.core.persistence.DbSession;
 import org.sonar.server.db.DbClient;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.ws.BaseUsersWsAction;
 
 import java.util.HashMap;
@@ -79,7 +79,7 @@ public class ShowAction implements BaseUsersWsAction {
     try {
       ComponentDto fromParent = dbClient.componentDao().getByUuid(session, fromParentUuid);
       ComponentDto project = dbClient.componentDao().getByUuid(session, fromParent.projectUuid());
-      UserSession.get().checkProjectUuidPermission(UserRole.USER, project.uuid());
+      userSession.checkProjectUuidPermission(UserRole.USER, project.uuid());
 
       List<FileDependencyDto> fileDependencies = dbClient.fileDependencyDao().selectFromParents(session, fromParentUuid, toParentUuid, project.getId());
       writeResponse(response, fileDependencies, componentsByUuid(session, fileDependencies));

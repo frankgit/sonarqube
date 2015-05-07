@@ -30,7 +30,7 @@ import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.qualityprofile.QProfile;
 import org.sonar.server.qualityprofile.QProfileFactory;
 import org.sonar.server.qualityprofile.QProfileLookup;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -76,7 +76,7 @@ public class QProfileSetDefaultAction implements BaseQProfileWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+    userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
 
     String language = request.param(PARAM_LANGUAGE);
     String profileName = request.param(PARAM_PROFILE_NAME);

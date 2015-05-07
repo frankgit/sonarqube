@@ -58,6 +58,7 @@ import org.sonar.server.issue.index.IssueDoc;
 import org.sonar.server.issue.index.IssueIndex;
 import org.sonar.server.rule.Rule;
 import org.sonar.server.rule.RuleService;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import javax.annotation.CheckForNull;
@@ -341,7 +342,7 @@ public class SearchAction implements BaseIssuesWsAction {
 
     collectFacetsData(request, result, projectUuids, componentUuids, userLogins, actionPlanKeys);
 
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
     if (userSession.isLoggedIn()) {
       userLogins.add(userSession.login());
     }
@@ -418,7 +419,7 @@ public class SearchAction implements BaseIssuesWsAction {
       assignees.remove(IssueQueryService.LOGIN_MYSELF);
     }
     addMandatoryFacetValues(results, IssueFilterParameters.ASSIGNEES, assignees);
-    addMandatoryFacetValues(results, IssueFilterParameters.FACET_ASSIGNED_TO_ME, Arrays.asList(UserSession.get().login()));
+    addMandatoryFacetValues(results, IssueFilterParameters.FACET_ASSIGNED_TO_ME, Arrays.asList(userSession.login()));
     addMandatoryFacetValues(results, IssueFilterParameters.REPORTERS, request.paramAsStrings(IssueFilterParameters.REPORTERS));
     addMandatoryFacetValues(results, IssueFilterParameters.RULES, request.paramAsStrings(IssueFilterParameters.RULES));
     addMandatoryFacetValues(results, IssueFilterParameters.LANGUAGES, request.paramAsStrings(IssueFilterParameters.LANGUAGES));
@@ -574,7 +575,7 @@ public class SearchAction implements BaseIssuesWsAction {
   private void writeIssueComments(Collection<DefaultIssueComment> issueComments, Map<String, User> usersByLogin, JsonWriter json) {
     if (!issueComments.isEmpty()) {
       json.name("comments").beginArray();
-      String login = UserSession.get().login();
+      String login = userSession.login();
       for (IssueComment comment : issueComments) {
         String userLogin = comment.userLogin();
         User user = userLogin != null ? usersByLogin.get(userLogin) : null;
@@ -792,7 +793,7 @@ public class SearchAction implements BaseIssuesWsAction {
   @CheckForNull
   private String formatDate(@Nullable Date date) {
     if (date != null) {
-      return i18n.formatDateTime(UserSession.get().locale(), date);
+      return i18n.formatDateTime(userSession.locale(), date);
     }
     return null;
   }
@@ -800,7 +801,7 @@ public class SearchAction implements BaseIssuesWsAction {
   @CheckForNull
   private String formatAgeDate(@Nullable Date date) {
     if (date != null) {
-      return i18n.ageFromNow(UserSession.get().locale(), date);
+      return i18n.ageFromNow(userSession.locale(), date);
     }
     return null;
   }

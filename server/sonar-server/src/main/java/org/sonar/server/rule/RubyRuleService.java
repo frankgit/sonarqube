@@ -33,7 +33,7 @@ import org.sonar.server.rule.index.RuleNormalizer;
 import org.sonar.server.rule.index.RuleQuery;
 import org.sonar.server.search.QueryContext;
 import org.sonar.server.search.Result;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.util.RubyUtils;
 
 import javax.annotation.CheckForNull;
@@ -125,7 +125,7 @@ public class RubyRuleService implements ServerComponent, Startable {
         Strings.emptyToNull((String) params.get("debtRemediationOffset")))
         );
     }
-    updater.update(update, UserSession.get());
+    updater.update(update, userSession);
   }
 
   /**

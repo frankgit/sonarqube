@@ -41,7 +41,7 @@ public class UserSessionFilter implements Filter {
     try {
       chain.doFilter(servletRequest, servletResponse);
     } finally {
-      UserSession.remove();
+      ThreadLocalUserSession.remove();
     }
   }
 }

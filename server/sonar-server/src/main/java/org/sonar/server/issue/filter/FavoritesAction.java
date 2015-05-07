@@ -26,6 +26,7 @@ import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.api.utils.text.JsonWriter;
 import org.sonar.core.issue.db.IssueFilterDto;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 public class FavoritesAction implements RequestHandler {
@@ -46,7 +47,7 @@ public class FavoritesAction implements RequestHandler {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession session = UserSession.get();
+    UserSession session = userSession;
     JsonWriter json = response.newJsonWriter();
     json.beginObject().name("favoriteFilters").beginArray();
     if (session.isLoggedIn()) {

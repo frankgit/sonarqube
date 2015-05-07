@@ -30,7 +30,7 @@ import org.sonar.core.persistence.DbSession;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.qualityprofile.QProfileFactory;
 import org.sonar.server.qualityprofile.RuleActivator;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -78,7 +78,7 @@ public class QProfileChangeParentAction implements BaseQProfileWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+    userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
 
     DbSession session = dbClient.openSession(false);
     try {

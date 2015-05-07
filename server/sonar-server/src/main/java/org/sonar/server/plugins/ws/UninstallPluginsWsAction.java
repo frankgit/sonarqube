@@ -28,7 +28,7 @@ import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.server.plugins.ServerPluginJarsInstaller;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import static com.google.common.collect.Iterables.find;
 import static java.lang.String.format;
@@ -63,7 +63,7 @@ public class UninstallPluginsWsAction implements PluginsWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
     String key = request.mandatoryParam(PARAM_KEY);
     ensurePluginIsInstalled(key);
     pluginJarsInstaller.uninstall(key);

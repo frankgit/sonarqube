@@ -19,8 +19,16 @@
  */
 package org.sonar.server.issue;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang.StringUtils;
 import org.sonar.api.ServerComponent;
 import org.sonar.api.issue.ActionPlan;
@@ -57,10 +65,8 @@ import org.sonar.server.user.UserSession;
 import org.sonar.server.user.index.UserDoc;
 import org.sonar.server.user.index.UserIndex;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-
-import java.util.*;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
 public class IssueService implements ServerComponent {
 
@@ -76,6 +82,7 @@ public class IssueService implements ServerComponent {
   private final UserFinder userFinder;
   private final UserIndex userIndex;
   private final SourceLineIndex sourceLineIndex;
+  private final UserSession userSession;
 
   public IssueService(DbClient dbClient, IssueIndex issueIndex,
     IssueWorkflow workflow,
@@ -85,7 +92,7 @@ public class IssueService implements ServerComponent {
     ActionPlanService actionPlanService,
     RuleFinder ruleFinder,
     UserFinder userFinder,
-    UserIndex userIndex, SourceLineIndex sourceLineIndex) {
+    UserIndex userIndex, SourceLineIndex sourceLineIndex, UserSession userSession) {
     this.dbClient = dbClient;
     this.issueIndex = issueIndex;
     this.workflow = workflow;
@@ -97,6 +104,7 @@ public class IssueService implements ServerComponent {
     this.userFinder = userFinder;
     this.userIndex = userIndex;
     this.sourceLineIndex = sourceLineIndex;
+    this.userSession = userSession;
   }
 
   public List<String> listStatus() {
@@ -130,7 +138,7 @@ public class IssueService implements ServerComponent {
     for (Transition transition : outTransitions) {
       String projectUuid = issue.projectUuid();
       if (StringUtils.isBlank(transition.requiredProjectPermission()) ||
-        (projectUuid != null && UserSession.get().hasProjectPermissionByUuid(transition.requiredProjectPermission(), projectUuid))) {
+        (projectUuid != null && userSession.hasProjectPermissionByUuid(transition.requiredProjectPermission(), projectUuid))) {
         allowedTransitions.add(transition);
       }
     }
@@ -143,8 +151,8 @@ public class IssueService implements ServerComponent {
     DbSession session = dbClient.openSession(false);
     try {
       DefaultIssue defaultIssue = getByKeyForUpdate(session, issueKey).toDefaultIssue();
-      IssueChangeContext context = IssueChangeContext.createUser(new Date(), UserSession.get().login());
-      checkTransitionPermission(transitionKey, UserSession.get(), defaultIssue);
+      IssueChangeContext context = IssueChangeContext.createUser(new Date(), userSession.login());
+      checkTransitionPermission(transitionKey, userSession, defaultIssue);
       if (workflow.doTransition(defaultIssue, transitionKey, context)) {
         saveIssue(session, defaultIssue, context, null);
       }
@@ -178,7 +186,7 @@ public class IssueService implements ServerComponent {
           throw new NotFoundException("Unknown user: " + assignee);
         }
       }
-      IssueChangeContext context = IssueChangeContext.createUser(new Date(), UserSession.get().login());
+      IssueChangeContext context = IssueChangeContext.createUser(new Date(), userSession.login());
       if (issueUpdater.assign(issue, user, context)) {
         saveIssue(session, issue, context, null);
       }
@@ -196,14 +204,14 @@ public class IssueService implements ServerComponent {
     try {
       ActionPlan actionPlan = null;
       if (!Strings.isNullOrEmpty(actionPlanKey)) {
-        actionPlan = actionPlanService.findByKey(actionPlanKey, UserSession.get());
+        actionPlan = actionPlanService.findByKey(actionPlanKey, userSession);
         if (actionPlan == null) {
           throw new NotFoundException("Unknown action plan: " + actionPlanKey);
         }
       }
       DefaultIssue issue = getByKeyForUpdate(session, issueKey).toDefaultIssue();
 
-      IssueChangeContext context = IssueChangeContext.createUser(new Date(), UserSession.get().login());
+      IssueChangeContext context = IssueChangeContext.createUser(new Date(), userSession.login());
       if (issueUpdater.plan(issue, actionPlan, context)) {
         saveIssue(session, issue, context, null);
       }
@@ -220,9 +228,9 @@ public class IssueService implements ServerComponent {
     DbSession session = dbClient.openSession(false);
     try {
       DefaultIssue issue = getByKeyForUpdate(session, issueKey).toDefaultIssue();
-      UserSession.get().checkProjectPermission(UserRole.ISSUE_ADMIN, issue.projectKey());
+      userSession.checkProjectPermission(UserRole.ISSUE_ADMIN, issue.projectKey());
 
-      IssueChangeContext context = IssueChangeContext.createUser(new Date(), UserSession.get().login());
+      IssueChangeContext context = IssueChangeContext.createUser(new Date(), userSession.login());
       if (issueUpdater.setManualSeverity(issue, severity, context)) {
         saveIssue(session, issue, context, null);
       }
@@ -241,7 +249,7 @@ public class IssueService implements ServerComponent {
       ComponentDto component = dbClient.componentDao().getByKey(session, componentKey);
       ComponentDto project = dbClient.componentDao().getByUuid(session, component.projectUuid());
 
-      UserSession.get().checkProjectPermission(UserRole.USER, project.getKey());
+      userSession.checkProjectPermission(UserRole.USER, project.getKey());
       if (!ruleKey.isManual()) {
         throw new IllegalArgumentException("Issues can be created only on rules marked as 'manual': " + ruleKey);
       }
@@ -258,7 +266,7 @@ public class IssueService implements ServerComponent {
         .severity(Objects.firstNonNull(severity, Severity.MAJOR))
         .effortToFix(effortToFix)
         .ruleKey(ruleKey)
-        .reporter(UserSession.get().login())
+        .reporter(userSession.login())
         .assignee(findSourceLineUser(component.uuid(), line))
         .build();
 
@@ -311,7 +319,7 @@ public class IssueService implements ServerComponent {
   }
 
   private void verifyLoggedIn() {
-    UserSession.get().checkLoggedIn();
+    userSession.checkLoggedIn();
   }
 
   /**
@@ -337,7 +345,7 @@ public class IssueService implements ServerComponent {
     DbSession session = dbClient.openSession(false);
     try {
       DefaultIssue issue = getByKeyForUpdate(session, issueKey).toDefaultIssue();
-      IssueChangeContext context = IssueChangeContext.createUser(new Date(), UserSession.get().login());
+      IssueChangeContext context = IssueChangeContext.createUser(new Date(), userSession.login());
       if (issueUpdater.setTags(issue, tags, context)) {
         saveIssue(session, issue, context, null);
       }

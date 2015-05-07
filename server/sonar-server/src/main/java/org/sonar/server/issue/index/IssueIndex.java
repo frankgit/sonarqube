@@ -67,7 +67,7 @@ import org.sonar.server.issue.filter.IssueFilterParameters;
 import org.sonar.server.rule.index.RuleNormalizer;
 import org.sonar.server.search.IndexDefinition;
 import org.sonar.server.search.StickyFacetBuilder;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.view.index.ViewIndexDefinition;
 
 import javax.annotation.CheckForNull;
@@ -521,7 +521,7 @@ public class IssueIndex extends BaseIndex {
   }
 
   private void addAssignedToMeFacetIfNeeded(SearchRequestBuilder builder, SearchOptions options, IssueQuery query, Map<String, FilterBuilder> filters, QueryBuilder queryBuilder) {
-    String login = UserSession.get().login();
+    String login = userSession.login();
 
     if (!options.getFacets().contains(IssueFilterParameters.FACET_ASSIGNED_TO_ME) || StringUtils.isEmpty(login)) {
       return;
@@ -713,7 +713,7 @@ public class IssueIndex extends BaseIndex {
    */
   public Iterator<IssueDoc> selectIssuesForBatch(ComponentDto component) {
     BoolFilterBuilder filter = FilterBuilders.boolFilter()
-      .must(createAuthorizationFilter(true, UserSession.get().login(), UserSession.get().userGroups()))
+      .must(createAuthorizationFilter(true, userSession.login(), userSession.userGroups()))
       .mustNot(FilterBuilders.termsFilter(IssueIndexDefinition.FIELD_ISSUE_STATUS, Issue.STATUS_CLOSED));
 
     switch (component.scope()) {

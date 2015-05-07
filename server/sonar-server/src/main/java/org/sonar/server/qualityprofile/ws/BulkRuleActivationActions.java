@@ -31,7 +31,7 @@ import org.sonar.server.qualityprofile.BulkChangeResult;
 import org.sonar.server.qualityprofile.QProfileService;
 import org.sonar.server.rule.RuleService;
 import org.sonar.server.rule.ws.SearchAction;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 public class BulkRuleActivationActions implements ServerComponent {
 
@@ -120,7 +120,7 @@ public class BulkRuleActivationActions implements ServerComponent {
     JsonWriter json = response.newJsonWriter().beginObject();
     json.prop("succeeded", result.countSucceeded());
     json.prop("failed", result.countFailed());
-    result.getErrors().writeJsonAsWarnings(json, i18n, UserSession.get().locale());
+    result.getErrors().writeJsonAsWarnings(json, i18n, userSession.locale());
     json.endObject().close();
   }
 }

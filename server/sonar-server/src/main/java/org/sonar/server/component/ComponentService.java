@@ -39,7 +39,7 @@ import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.permission.InternalPermissionService;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -113,7 +113,7 @@ public class ComponentService implements ServerComponent {
     DbSession session = dbClient.openSession(false);
     try {
       ComponentDto projectOrModule = getByKey(session, projectOrModuleKey);
-      UserSession.get().checkProjectUuidPermission(UserRole.ADMIN, projectOrModule.projectUuid());
+      userSession.checkProjectUuidPermission(UserRole.ADMIN, projectOrModule.projectUuid());
       resourceKeyUpdaterDao.updateKey(projectOrModule.getId(), newKey);
       session.commit();
 
@@ -127,7 +127,7 @@ public class ComponentService implements ServerComponent {
     DbSession session = dbClient.openSession(false);
     try {
       ComponentDto project = getByKey(projectKey);
-      UserSession.get().checkProjectUuidPermission(UserRole.ADMIN, project.projectUuid());
+      userSession.checkProjectUuidPermission(UserRole.ADMIN, project.projectUuid());
       return resourceKeyUpdaterDao.checkModuleKeysBeforeRenaming(project.getId(), stringToReplace, replacementString);
     } finally {
       session.close();
@@ -139,7 +139,7 @@ public class ComponentService implements ServerComponent {
     DbSession session = dbClient.openSession(true);
     try {
       ComponentDto project = getByKey(session, projectKey);
-      UserSession.get().checkProjectUuidPermission(UserRole.ADMIN, project.projectUuid());
+      userSession.checkProjectUuidPermission(UserRole.ADMIN, project.projectUuid());
       resourceKeyUpdaterDao.bulkUpdateKey(session, project.getId(), stringToReplace, replacementString);
       session.commit();
     } finally {
@@ -148,7 +148,7 @@ public class ComponentService implements ServerComponent {
   }
 
   public String create(NewComponent newComponent) {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.PROVISIONING);
+    userSession.checkGlobalPermission(GlobalPermissions.PROVISIONING);
 
     DbSession session = dbClient.openSession(false);
     try {

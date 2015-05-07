@@ -32,7 +32,7 @@ import org.sonar.core.measure.db.MeasureDto;
 import org.sonar.core.persistence.DbSession;
 import org.sonar.core.persistence.MyBatis;
 import org.sonar.server.measure.persistence.MeasureDao;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 
@@ -55,7 +55,7 @@ public class CoverageService implements ServerComponent {
   }
 
   public void checkPermission(String fileKey) {
-    UserSession.get().checkComponentPermission(UserRole.CODEVIEWER, fileKey);
+    userSession.checkComponentPermission(UserRole.CODEVIEWER, fileKey);
   }
 
   public Map<Integer, Integer> getHits(String fileKey, CoverageService.TYPE type) {

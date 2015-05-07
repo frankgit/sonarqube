@@ -108,7 +108,7 @@ public class DefaultUserService implements RubyUserService {
     if (Strings.isNullOrEmpty(login)) {
       throw new BadRequestException("Login is missing");
     }
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
     userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
     if (Objects.equal(userSession.login(), login)) {
       throw new BadRequestException("Self-deactivation is not possible");

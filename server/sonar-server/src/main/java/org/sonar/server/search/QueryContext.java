@@ -20,7 +20,7 @@
 package org.sonar.server.search;
 
 import com.google.common.base.Preconditions;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.Nullable;
 
@@ -53,8 +53,8 @@ public class QueryContext {
   private Set<String> userGroups = newHashSet();
 
   public QueryContext() {
-    this.userLogin = UserSession.get().login();
-    this.userGroups = UserSession.get().userGroups();
+    this.userLogin = userSession.login();
+    this.userGroups = userSession.userGroups();
   }
 
   /**

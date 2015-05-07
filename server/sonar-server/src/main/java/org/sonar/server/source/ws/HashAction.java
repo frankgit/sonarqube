@@ -30,7 +30,7 @@ import org.sonar.api.web.UserRole;
 import org.sonar.core.component.ComponentDto;
 import org.sonar.core.persistence.DbSession;
 import org.sonar.server.db.DbClient;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -65,7 +65,7 @@ public class HashAction implements SourcesAction {
     try (DbSession session = dbClient.openSession(false)) {
       final String componentKey = request.mandatoryParam("key");
       final ComponentDto component = dbClient.componentDao().getByKey(session, componentKey);
-      UserSession.get().checkProjectUuidPermission(UserRole.USER, component.projectUuid());
+      userSession.checkProjectUuidPermission(UserRole.USER, component.projectUuid());
 
       response.stream().setMediaType("text/plain");
       OutputStreamWriter writer = new OutputStreamWriter(response.stream().output(), Charsets.UTF_8);

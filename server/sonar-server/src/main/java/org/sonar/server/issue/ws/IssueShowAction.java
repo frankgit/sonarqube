@@ -49,7 +49,7 @@ import org.sonar.server.issue.IssueService;
 import org.sonar.server.issue.actionplan.ActionPlanService;
 import org.sonar.server.rule.Rule;
 import org.sonar.server.rule.RuleService;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -131,7 +131,7 @@ public class IssueShowAction implements BaseIssuesWsAction {
 
   private void writeIssue(DbSession session, Issue issue, JsonWriter json) {
     String actionPlanKey = issue.actionPlanKey();
-    ActionPlan actionPlan = actionPlanKey != null ? actionPlanService.findByKey(actionPlanKey, UserSession.get()) : null;
+    ActionPlan actionPlan = actionPlanKey != null ? actionPlanService.findByKey(actionPlanKey, userSession) : null;
     Duration debt = issue.debt();
     Rule rule = ruleService.getNonNullByKey(issue.ruleKey());
     Date updateDate = issue.updateDate();
@@ -190,7 +190,7 @@ public class IssueShowAction implements BaseIssuesWsAction {
 
   private void writeComments(Issue issue, JsonWriter json) {
     json.name("comments").beginArray();
-    String login = UserSession.get().login();
+    String login = userSession.login();
 
     Map<String, User> usersByLogin = newHashMap();
     List<DefaultIssueComment> comments = commentService.findComments(issue.key());
@@ -228,7 +228,7 @@ public class IssueShowAction implements BaseIssuesWsAction {
       .prop("creationDate", DateUtils.formatDateTime(issue.creationDate()))
       .prop("fCreationDate", formatDate(issue.creationDate()))
       .name("diffs").beginArray()
-      .value(i18n.message(UserSession.get().locale(), "created", null))
+      .value(i18n.message(userSession.locale(), "created", null))
       .endArray()
       .endObject();
 
@@ -263,7 +263,7 @@ public class IssueShowAction implements BaseIssuesWsAction {
   @CheckForNull
   private String formatDate(@Nullable Date date) {
     if (date != null) {
-      return i18n.formatDateTime(UserSession.get().locale(), date);
+      return i18n.formatDateTime(userSession.locale(), date);
     }
     return null;
   }
@@ -271,7 +271,7 @@ public class IssueShowAction implements BaseIssuesWsAction {
   @CheckForNull
   private String formatAgeDate(@Nullable Date date) {
     if (date != null) {
-      return i18n.ageFromNow(UserSession.get().locale(), date);
+      return i18n.ageFromNow(userSession.locale(), date);
     }
     return null;
   }

@@ -35,7 +35,7 @@ import org.sonar.core.persistence.MyBatis;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.test.index.CoveredFileDoc;
 import org.sonar.server.test.index.TestIndex;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class TestsCoveredFilesAction implements TestAction {
   @Override
   public void handle(Request request, Response response) {
     String testUuid = request.mandatoryParam(TEST_UUID);
-    UserSession.get().checkComponentUuidPermission(UserRole.CODEVIEWER, index.searchByTestUuid(testUuid).fileUuid());
+    userSession.checkComponentUuidPermission(UserRole.CODEVIEWER, index.searchByTestUuid(testUuid).fileUuid());
 
     List<CoveredFileDoc> coveredFiles = index.coveredFiles(testUuid);
     Map<String, ComponentDto> componentsByUuid = buildComponentsByUuid(coveredFiles);

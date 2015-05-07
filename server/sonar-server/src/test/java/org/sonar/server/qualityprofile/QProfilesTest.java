@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -117,24 +117,24 @@ public class QProfilesTest {
   @Test
   public void add_project() throws Exception {
     qProfiles.addProject("sonar-way-java", "ABCD");
-    verify(projectOperations).addProject(eq("sonar-way-java"), eq("ABCD"), any(UserSession.class));
+    verify(projectOperations).addProject(eq("sonar-way-java"), eq("ABCD"), any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void remove_project_by_quality_profile_key() throws Exception {
     qProfiles.removeProject("sonar-way-java", "ABCD");
-    verify(projectOperations).removeProject(eq("sonar-way-java"), eq("ABCD"), any(UserSession.class));
+    verify(projectOperations).removeProject(eq("sonar-way-java"), eq("ABCD"), any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void remove_project_by_language() throws Exception {
     qProfiles.removeProjectByLanguage("java", 10L);
-    verify(projectOperations).removeProject(eq("java"), eq(10L), any(UserSession.class));
+    verify(projectOperations).removeProject(eq("java"), eq(10L), any(ThreadLocalUserSession.class));
   }
 
   @Test
   public void remove_all_projects() throws Exception {
     qProfiles.removeAllProjects("sonar-way-java");
-    verify(projectOperations).removeAllProjects(eq("sonar-way-java"), any(UserSession.class));
+    verify(projectOperations).removeAllProjects(eq("sonar-way-java"), any(ThreadLocalUserSession.class));
   }
 }

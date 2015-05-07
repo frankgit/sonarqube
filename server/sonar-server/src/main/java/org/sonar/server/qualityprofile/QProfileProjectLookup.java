@@ -29,6 +29,7 @@ import org.sonar.core.persistence.DbSession;
 import org.sonar.core.persistence.MyBatis;
 import org.sonar.core.qualityprofile.db.QualityProfileDto;
 import org.sonar.server.db.DbClient;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import javax.annotation.CheckForNull;
@@ -55,7 +56,7 @@ public class QProfileProjectLookup implements ServerComponent {
         componentsByKeys.put(component.key(), component);
       }
 
-      UserSession userSession = UserSession.get();
+      UserSession userSession = userSession;
       List<Component> result = Lists.newArrayList();
       Collection<String> authorizedProjectKeys = db.authorizationDao().selectAuthorizedRootProjectsKeys(userSession.userId(), UserRole.USER);
       for (Map.Entry<String, Component> entry : componentsByKeys.entrySet()) {

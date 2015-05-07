@@ -44,7 +44,7 @@ import org.sonar.api.web.WidgetProperties;
 import org.sonar.api.web.WidgetProperty;
 import org.sonar.api.web.WidgetScope;
 import org.sonar.core.component.ComponentDto;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Collection;
 import java.util.Map;
@@ -277,7 +277,7 @@ public class ViewProxy<V extends View> implements Comparable<ViewProxy> {
   public boolean isUserAuthorized() {
     boolean authorized = userRoles.length == 0;
     for (String userRole : getUserRoles()) {
-      authorized |= UserSession.get().hasGlobalPermission(userRole);
+      authorized |= userSession.hasGlobalPermission(userRole);
     }
     return authorized;
   }
@@ -285,7 +285,7 @@ public class ViewProxy<V extends View> implements Comparable<ViewProxy> {
   public boolean isUserAuthorized(ComponentDto component) {
     boolean authorized = userRoles.length == 0;
     for (String userRole : getUserRoles()) {
-      authorized |= UserSession.get().hasProjectPermissionByUuid(userRole, component.uuid());
+      authorized |= userSession.hasProjectPermissionByUuid(userRole, component.uuid());
     }
     return authorized;
   }

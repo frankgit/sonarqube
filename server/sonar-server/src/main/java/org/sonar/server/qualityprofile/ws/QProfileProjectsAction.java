@@ -36,7 +36,7 @@ import org.sonar.core.qualityprofile.db.ProjectQprofileAssociationDto;
 import org.sonar.core.util.NonNullInputFunction;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.NotFoundException;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -117,7 +117,7 @@ public class QProfileProjectsAction implements BaseQProfileWsAction {
         }
       });
 
-      final Collection<Long> authorizedProjectIds = dbClient.authorizationDao().keepAuthorizedProjectIds(session, projectIds, UserSession.get().userId(), UserRole.USER);
+      final Collection<Long> authorizedProjectIds = dbClient.authorizationDao().keepAuthorizedProjectIds(session, projectIds, userSession.userId(), UserRole.USER);
       Iterable<ProjectQprofileAssociationDto> authorizedProjects = Iterables.filter(projects, new Predicate<ProjectQprofileAssociationDto>() {
         @Override
         public boolean apply(ProjectQprofileAssociationDto input) {

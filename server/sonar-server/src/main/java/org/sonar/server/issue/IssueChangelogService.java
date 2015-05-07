@@ -25,7 +25,7 @@ import org.sonar.api.issue.internal.FieldDiffs;
 import org.sonar.api.user.User;
 import org.sonar.api.user.UserFinder;
 import org.sonar.core.issue.db.IssueChangeDao;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Collection;
 import java.util.List;
@@ -69,6 +69,6 @@ public class IssueChangelogService implements ServerComponent {
   }
 
   public List<String> formatDiffs(FieldDiffs diffs) {
-    return formatter.format(UserSession.get().locale(), diffs);
+    return formatter.format(userSession.locale(), diffs);
   }
 }

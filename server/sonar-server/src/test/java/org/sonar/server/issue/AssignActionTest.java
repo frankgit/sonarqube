@@ -31,7 +31,7 @@ import org.sonar.api.user.User;
 import org.sonar.api.user.UserFinder;
 import org.sonar.core.issue.IssueUpdater;
 import org.sonar.core.user.DefaultUser;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.List;
 import java.util.Map;
@@ -95,7 +95,7 @@ public class AssignActionTest {
 
     List<Issue> issues = newArrayList((Issue) new DefaultIssue().setKey("ABC"));
     when(userFinder.findByLogin(assignee)).thenReturn(user);
-    assertThat(action.verify(properties, issues, mock(UserSession.class))).isTrue();
+    assertThat(action.verify(properties, issues, mock(ThreadLocalUserSession.class))).isTrue();
     assertThat(properties.get(AssignAction.VERIFIED_ASSIGNEE)).isEqualTo(user);
   }
 
@@ -110,7 +110,7 @@ public class AssignActionTest {
 
     List<Issue> issues = newArrayList((Issue) new DefaultIssue().setKey("ABC"));
     when(userFinder.findByLogin(assignee)).thenReturn(null);
-    action.verify(properties, issues, mock(UserSession.class));
+    action.verify(properties, issues, mock(ThreadLocalUserSession.class));
   }
 
   @Test
@@ -120,8 +120,8 @@ public class AssignActionTest {
     properties.put("assignee", assignee);
 
     List<Issue> issues = newArrayList((Issue) new DefaultIssue().setKey("ABC"));
-    action.verify(properties, issues, mock(UserSession.class));
-    assertThat(action.verify(properties, issues, mock(UserSession.class))).isTrue();
+    action.verify(properties, issues, mock(ThreadLocalUserSession.class));
+    assertThat(action.verify(properties, issues, mock(ThreadLocalUserSession.class))).isTrue();
     assertThat(properties.containsKey(AssignAction.VERIFIED_ASSIGNEE)).isTrue();
     assertThat(properties.get(AssignAction.VERIFIED_ASSIGNEE)).isNull();
   }

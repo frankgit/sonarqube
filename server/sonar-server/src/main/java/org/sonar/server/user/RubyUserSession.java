@@ -19,24 +19,32 @@
  */
 package org.sonar.server.user;
 
-import org.sonar.server.ui.JRubyI18n;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
-import java.util.List;
+import org.sonar.api.platform.ComponentContainer;
+import org.sonar.core.resource.ResourceDao;
+import org.sonar.core.user.AuthorizationDao;
+import org.sonar.server.platform.Platform;
+import org.sonar.server.ui.JRubyI18n;
 
 public class RubyUserSession {
   /**
    * Invoked by Ruby code - see application_controller.rb
    */
   public static void setSession(@Nullable Integer userId, @Nullable String login, @Nullable String name, @Nullable List<String> userGroups, @Nullable String localeRubyKey) {
-    UserSession session = new UserSession()
+    ComponentContainer container = Platform.getInstance().getContainer();
+    ThreadLocalUserSession threadLocalUserSession = container.getComponentByType(ThreadLocalUserSession.class);
+
+    UserSession session = new ServerUserSession(container.getComponentByType(AuthorizationDao.class),
+      container.getComponentByType(ResourceDao.class))
       .setLogin(login)
       .setName(name)
       .setUserId(userId)
       .setUserGroups(userGroups != null ? userGroups.toArray(new String[userGroups.size()]) : null)
       .setLocale(JRubyI18n.toLocale(localeRubyKey));
-    UserSession.set(session);
+    threadLocalUserSession.set(session);
   }
 
   private RubyUserSession() {

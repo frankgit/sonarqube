@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.sonar.api.CoreProperties;
 import org.sonar.api.config.Settings;
@@ -65,6 +66,7 @@ import org.sonar.server.source.index.SourceLineIndexer;
 import org.sonar.server.tester.ServerTester;
 import org.sonar.server.user.MockUserSession;
 import org.sonar.server.user.NewUser;
+import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.user.UserUpdater;
 import org.sonar.server.user.db.GroupDao;
 
@@ -80,6 +82,8 @@ public class IssueServiceMediumTest {
 
   @ClassRule
   public static ServerTester tester = new ServerTester();
+  @Rule
+  public UserSessionRule userSessionRule = new UserSessionRule();
 
   DbClient db;
   IssueIndex IssueIndex;
@@ -93,6 +97,7 @@ public class IssueServiceMediumTest {
     IssueIndex = tester.get(IssueIndex.class);
     session = db.openSession(false);
     service = tester.get(IssueService.class);
+    userSessionRule.useServerTest(tester);
   }
 
   @After

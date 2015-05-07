@@ -45,7 +45,7 @@ import org.sonar.server.debt.DebtModelXMLExporter.RuleDebt;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.rule.RuleDefinitionsLoader;
 import org.sonar.server.rule.RuleOperations;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -425,7 +425,7 @@ public class DebtModelBackup implements ServerComponent {
   }
 
   private void checkPermission() {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
   }
 
 }

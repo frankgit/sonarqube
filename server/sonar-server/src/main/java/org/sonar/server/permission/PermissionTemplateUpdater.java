@@ -31,6 +31,7 @@ import org.sonar.core.user.UserDao;
 import org.sonar.core.user.UserDto;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.ForbiddenException;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import javax.annotation.Nullable;
@@ -84,7 +85,7 @@ abstract class PermissionTemplateUpdater {
   }
 
   static void checkProjectAdminUser(@Nullable String componentKey) {
-    UserSession currentSession = UserSession.get();
+    UserSession currentSession = userSession;
     currentSession.checkLoggedIn();
     if (componentKey == null) {
       currentSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);

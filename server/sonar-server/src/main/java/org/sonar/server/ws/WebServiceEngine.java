@@ -33,7 +33,7 @@ import org.sonar.server.exceptions.Errors;
 import org.sonar.server.exceptions.Message;
 import org.sonar.server.exceptions.ServerException;
 import org.sonar.server.plugins.MimeTypes;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -124,7 +124,7 @@ public class WebServiceEngine implements ServerComponent, Startable {
 
     try {
       json.beginObject();
-      errors.writeJson(json, i18n, UserSession.get().locale());
+      errors.writeJson(json, i18n, userSession.locale());
       json.endObject();
     } finally {
       // TODO if close() fails, the runtime exception should not hide the

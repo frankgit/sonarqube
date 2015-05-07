@@ -31,6 +31,7 @@ import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.server.plugins.UpdateCenterClient;
 import org.sonar.server.ui.ViewProxy;
 import org.sonar.server.ui.Views;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 public class SettingsNavigationAction implements NavigationAction {
@@ -61,7 +62,7 @@ public class SettingsNavigationAction implements NavigationAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
     boolean isAdmin = userSession.hasGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
 
     JsonWriter json = response.newJsonWriter().beginObject();
@@ -72,7 +73,7 @@ public class SettingsNavigationAction implements NavigationAction {
     if (isAdmin) {
       for (ViewProxy<Page> page : views.getPages(NavigationSection.CONFIGURATION, null, null, null, null)) {
         json.beginObject()
-          .prop("name", i18n.message(UserSession.get().locale(), String.format("%s.page", page.getTitle()), page.getTitle()))
+          .prop("name", i18n.message(userSession.locale(), String.format("%s.page", page.getTitle()), page.getTitle()))
           .prop("url", getPageUrl(page))
           .endObject();
       }

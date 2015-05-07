@@ -35,7 +35,7 @@ import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.source.HtmlSourceDecorator;
 import org.sonar.server.source.index.SourceLineDoc;
 import org.sonar.server.source.index.SourceLineIndex;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Date;
 import java.util.List;
@@ -103,7 +103,7 @@ public class LinesAction implements SourcesAction {
   @Override
   public void handle(Request request, Response response) {
     ComponentDto component = loadComponent(request);
-    UserSession.get().checkProjectUuidPermission(UserRole.CODEVIEWER, component.projectUuid());
+    userSession.checkProjectUuidPermission(UserRole.CODEVIEWER, component.projectUuid());
 
     int from = Math.max(request.mandatoryParamAsInt("from"), 1);
     int to = (Integer) ObjectUtils.defaultIfNull(request.paramAsInt("to"), Integer.MAX_VALUE);

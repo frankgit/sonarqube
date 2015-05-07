@@ -34,6 +34,7 @@ import org.sonar.core.properties.PropertyDto;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.ForbiddenException;
 import org.sonar.server.plugins.MimeTypes;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 public class GlobalRepositoryAction implements BatchAction {
@@ -57,7 +58,7 @@ public class GlobalRepositoryAction implements BatchAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
     boolean hasScanPerm = userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
     boolean hasPreviewPerm = userSession.hasGlobalPermission(GlobalPermissions.PREVIEW_EXECUTION);
     if (!hasPreviewPerm && !hasScanPerm) {

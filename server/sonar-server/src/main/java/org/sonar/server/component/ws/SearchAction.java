@@ -32,7 +32,7 @@ import org.sonar.core.persistence.DbSession;
 import org.sonar.core.persistence.MyBatis;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.es.SearchOptions;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Collection;
 import java.util.List;
@@ -91,10 +91,10 @@ public class SearchAction implements RequestHandler {
     DbSession session = dbClient.openSession(false);
     try {
       ComponentDto componentDto = dbClient.componentDao().getByUuid(session, viewOrSubUuid);
-      UserSession.get().checkProjectUuidPermission(UserRole.USER, componentDto.projectUuid());
+      userSession.checkProjectUuidPermission(UserRole.USER, componentDto.projectUuid());
 
       Set<Long> projectIds = newLinkedHashSet(dbClient.componentIndexDao().selectProjectIdsFromQueryAndViewOrSubViewUuid(session, query, componentDto.uuid()));
-      Collection<Long> authorizedProjectIds = dbClient.authorizationDao().keepAuthorizedProjectIds(session, projectIds, UserSession.get().userId(), UserRole.USER);
+      Collection<Long> authorizedProjectIds = dbClient.authorizationDao().keepAuthorizedProjectIds(session, projectIds, userSession.userId(), UserRole.USER);
 
       SearchOptions options = new SearchOptions();
       options.setPage(request.mandatoryParamAsInt(PAGE), request.mandatoryParamAsInt(PAGE_SIZE));

@@ -37,7 +37,7 @@ import org.sonar.server.component.db.ComponentDao;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.measure.persistence.MeasureDao;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import java.util.List;
@@ -87,7 +87,7 @@ public class ShowAction implements RequestHandler {
       fileKey = componentDao.getByUuid(session, fileUuid).key();
     }
 
-    UserSession.get().checkComponentPermission(UserRole.CODEVIEWER, fileKey);
+    userSession.checkComponentPermission(UserRole.CODEVIEWER, fileKey);
 
     try {
       ComponentDto component = findComponent(fileKey, session);

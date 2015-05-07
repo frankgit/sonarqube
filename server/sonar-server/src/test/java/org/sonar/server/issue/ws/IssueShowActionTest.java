@@ -57,7 +57,7 @@ import org.sonar.server.rule.Rule;
 import org.sonar.server.rule.RuleService;
 import org.sonar.server.source.SourceService;
 import org.sonar.server.user.MockUserSession;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.ws.WsTester;
 
 import java.util.Date;
@@ -327,7 +327,7 @@ public class IssueShowActionTest {
       .setActionPlanKey("AP-ABCD");
     when(issueService.getByKey(issue.key())).thenReturn(issue);
 
-    when(actionPlanService.findByKey(eq(issue.actionPlanKey()), any(UserSession.class))).thenReturn(new DefaultActionPlan().setKey("AP-ABCD").setName("Version 4.2"));
+    when(actionPlanService.findByKey(eq(issue.actionPlanKey()), any(ThreadLocalUserSession.class))).thenReturn(new DefaultActionPlan().setKey("AP-ABCD").setName("Version 4.2"));
 
     MockUserSession.set();
     WsTester.TestRequest request = tester.newGetRequest("api/issues", "show").setParam("key", issue.key());

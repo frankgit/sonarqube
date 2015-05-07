@@ -30,7 +30,7 @@ import org.sonar.core.component.ComponentDto;
 import org.sonar.core.persistence.DbSession;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.source.SourceService;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.List;
 
@@ -72,7 +72,7 @@ public class IndexAction implements SourcesAction {
   @Override
   public void handle(Request request, Response response) {
     String fileKey = request.mandatoryParam("resource");
-    UserSession.get().checkComponentPermission(UserRole.CODEVIEWER, fileKey);
+    userSession.checkComponentPermission(UserRole.CODEVIEWER, fileKey);
     Integer from = request.mandatoryParamAsInt("from");
     Integer to = request.paramAsInt("to");
     try (DbSession session = dbClient.openSession(false)) {

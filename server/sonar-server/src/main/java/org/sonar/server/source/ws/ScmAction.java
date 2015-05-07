@@ -36,7 +36,7 @@ import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.source.index.SourceLineDoc;
 import org.sonar.server.source.index.SourceLineIndex;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Date;
 import java.util.List;
@@ -101,7 +101,7 @@ public class ScmAction implements SourcesAction {
     DbSession session = dbClient.openSession(false);
     try {
       ComponentDto fileDto = dbClient.componentDao().getByKey(session, fileKey);
-      UserSession.get().checkProjectUuidPermission(UserRole.CODEVIEWER, fileDto.projectUuid());
+      userSession.checkProjectUuidPermission(UserRole.CODEVIEWER, fileDto.projectUuid());
       List<SourceLineDoc> sourceLines = sourceLineIndex.getLines(fileDto.uuid(), from, to);
       if (sourceLines.isEmpty()) {
         throw new NotFoundException("File '" + fileKey + "' has no sources");

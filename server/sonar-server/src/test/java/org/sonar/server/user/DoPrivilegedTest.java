@@ -27,26 +27,26 @@ public class DoPrivilegedTest {
 
   @Test
   public void should_allow_everything_in_privileged_block_only() {
-    DoPrivileged.execute(new DoPrivileged.Task() {
+    DoPrivileged.execute(new DoPrivileged.Task(threadLocalUserSession) {
       @Override
       protected void doPrivileged() {
-        UserSession userSession = UserSession.get();
+        UserSession userSession = userSession;
         assertThat(userSession.isLoggedIn()).isFalse();
         assertThat(userSession.hasGlobalPermission("any permission")).isTrue();
         assertThat(userSession.hasProjectPermission("any permission", "any project")).isTrue();
       }
     });
 
-    assertThat(UserSession.get().isLoggedIn()).isFalse();
+    assertThat(userSession.isLoggedIn()).isFalse();
   }
 
   @Test
   public void should_lose_privileges_on_exception() {
     try {
-      DoPrivileged.execute(new DoPrivileged.Task() {
+      DoPrivileged.execute(new DoPrivileged.Task(threadLocalUserSession) {
         @Override
         protected void doPrivileged() {
-          UserSession userSession = UserSession.get();
+          UserSession userSession = userSession;
           assertThat(userSession.isLoggedIn()).isTrue();
           assertThat(userSession.hasGlobalPermission("any permission")).isTrue();
           assertThat(userSession.hasProjectPermission("any permission", "any project")).isTrue();
@@ -55,7 +55,7 @@ public class DoPrivilegedTest {
         }
       });
     } catch(Throwable ignored) {
-      assertThat(UserSession.get().isLoggedIn()).isFalse();
+      assertThat(userSession.isLoggedIn()).isFalse();
     }
   }
 

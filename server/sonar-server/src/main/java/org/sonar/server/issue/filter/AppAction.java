@@ -27,6 +27,7 @@ import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.api.utils.text.JsonWriter;
 import org.sonar.core.issue.db.IssueFilterDto;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public class AppAction implements RequestHandler {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession session = UserSession.get();
+    UserSession session = userSession;
 
     JsonWriter json = response.newJsonWriter();
     json.beginObject();

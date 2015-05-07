@@ -25,7 +25,7 @@ import org.sonar.api.server.ws.WebService;
 import org.sonar.api.server.ws.WebService.NewAction;
 import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.server.qualityprofile.QProfileFactory;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 public class QProfileRenameAction implements BaseQProfileWsAction {
 
@@ -59,7 +59,7 @@ public class QProfileRenameAction implements BaseQProfileWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+    userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
 
     String newName = request.mandatoryParam(PARAM_PROFILE_NAME);
     String profileKey = request.mandatoryParam(PARAM_PROFILE_KEY);

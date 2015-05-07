@@ -34,7 +34,7 @@ import org.sonar.server.db.DbClient;
 import org.sonar.server.issue.index.IssueAuthorizationIndexer;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.ForbiddenException;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -117,7 +117,7 @@ public class InternalPermissionService implements ServerComponent {
   }
 
   public void applyDefaultPermissionTemplate(final String componentKey) {
-    UserSession.get().checkLoggedIn();
+    userSession.checkLoggedIn();
 
     DbSession session = dbClient.openSession(false);
     try {
@@ -126,7 +126,7 @@ public class InternalPermissionService implements ServerComponent {
       if (provisioned == null) {
         checkProjectAdminPermission(componentKey);
       } else {
-        UserSession.get().checkGlobalPermission(GlobalPermissions.PROVISIONING);
+        userSession.checkGlobalPermission(GlobalPermissions.PROVISIONING);
       }
       permissionFacade.grantDefaultRoles(session, component.getId(), component.qualifier());
       session.commit();
@@ -137,7 +137,7 @@ public class InternalPermissionService implements ServerComponent {
   }
 
   public void applyPermissionTemplate(Map<String, Object> params) {
-    UserSession.get().checkLoggedIn();
+    userSession.checkLoggedIn();
     ApplyPermissionTemplateQuery query = ApplyPermissionTemplateQuery.buildFromParams(params);
     applyPermissionTemplate(query);
   }
@@ -155,7 +155,7 @@ public class InternalPermissionService implements ServerComponent {
         checkProjectAdminPermission(query.getSelectedComponents().get(0));
       } else {
         checkProjectAdminPermission(null);
-        UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+        userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
       }
 
       for (String componentKey : query.getSelectedComponents()) {
@@ -173,7 +173,7 @@ public class InternalPermissionService implements ServerComponent {
   }
 
   private void applyChange(Operation operation, PermissionChange change, DbSession session) {
-    UserSession.get().checkLoggedIn();
+    userSession.checkLoggedIn();
     change.validate();
     boolean changed;
     if (change.user() != null) {
@@ -267,9 +267,9 @@ public class InternalPermissionService implements ServerComponent {
 
   private void checkProjectAdminPermission(@Nullable String projectKey) {
     if (projectKey == null) {
-      UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+      userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
     } else {
-      if (!UserSession.get().hasGlobalPermission(GlobalPermissions.SYSTEM_ADMIN) && !UserSession.get().hasProjectPermission(UserRole.ADMIN, projectKey)) {
+      if (!userSession.hasGlobalPermission(GlobalPermissions.SYSTEM_ADMIN) && !userSession.hasProjectPermission(UserRole.ADMIN, projectKey)) {
         throw new ForbiddenException("Insufficient privileges");
       }
     }

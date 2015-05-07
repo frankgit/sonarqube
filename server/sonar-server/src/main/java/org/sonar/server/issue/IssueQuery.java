@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.server.search.QueryContext;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -318,8 +318,8 @@ public class IssueQuery {
     private String sort;
     private Boolean asc = false;
     private Boolean ignorePaging = false;
-    private String userLogin = UserSession.get().login();
-    private Set<String> userGroups = UserSession.get().userGroups();
+    private String userLogin = userSession.login();
+    private Set<String> userGroups = userSession.userGroups();
     private boolean checkAuthorization = true;
 
     private Builder() {

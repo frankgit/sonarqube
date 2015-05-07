@@ -33,7 +33,7 @@ import org.sonar.server.db.DbClient;
 import org.sonar.server.es.SearchOptions;
 import org.sonar.server.rule.index.RuleQuery;
 import org.sonar.server.search.Result;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -205,8 +205,8 @@ public class QProfileService implements ServerComponent {
   }
 
   private void verifyAdminPermission() {
-    UserSession.get().checkLoggedIn();
-    UserSession.get().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+    userSession.checkLoggedIn();
+    userSession.checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
   }
 
   public Result<QProfileActivity> searchActivities(QProfileActivityQuery query, SearchOptions options) {

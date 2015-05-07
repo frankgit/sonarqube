@@ -52,6 +52,7 @@ import org.sonar.server.rule.index.RuleNormalizer;
 import org.sonar.server.rule.index.RuleQuery;
 import org.sonar.server.search.QueryContext;
 import org.sonar.server.search.Result;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import javax.annotation.Nullable;
@@ -85,7 +86,7 @@ public class ProjectRepositoryLoader implements ServerComponent {
   }
 
   public ProjectRepositories load(ProjectRepositoryQuery query) {
-    boolean hasScanPerm = UserSession.get().hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+    boolean hasScanPerm = userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
     checkPermission(query.isPreview());
 
     DbSession session = dbClient.openSession(false);
@@ -96,7 +97,7 @@ public class ProjectRepositoryLoader implements ServerComponent {
       // Current project/module can be null when analysing a new project
       if (module != null) {
         // Scan permission is enough to analyze all projects but preview permission is limited to projects user can access
-        if (query.isPreview() && !UserSession.get().hasProjectPermissionByUuid(UserRole.USER, module.projectUuid())) {
+        if (query.isPreview() && !userSession.hasProjectPermissionByUuid(UserRole.USER, module.projectUuid())) {
           throw new ForbiddenException("You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
         }
 
@@ -303,7 +304,7 @@ public class ProjectRepositoryLoader implements ServerComponent {
   }
 
   private void checkPermission(boolean preview) {
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
     boolean hasScanPerm = userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
     boolean hasPreviewPerm = userSession.hasGlobalPermission(GlobalPermissions.PREVIEW_EXECUTION);
     if (!hasPreviewPerm && !hasScanPerm) {

@@ -31,7 +31,7 @@ import org.sonar.core.persistence.DbSession;
 import org.sonar.core.user.UserDto;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.NotFoundException;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.Collection;
 
@@ -61,7 +61,7 @@ public class DashboardsShowAction implements DashboardsAction {
   public void handle(Request request, Response response) throws Exception {
     DbSession dbSession = dbClient.openSession(false);
     try {
-      Integer userId = UserSession.get().userId();
+      Integer userId = userSession.userId();
       DashboardDto dashboard = dbClient.dashboardDao().getAllowedByKey(dbSession, request.mandatoryParamAsLong(PARAM_KEY),
         userId != null ? userId.longValue() : null);
       if (dashboard == null) {

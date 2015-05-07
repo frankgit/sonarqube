@@ -36,7 +36,7 @@ import org.sonar.core.technicaldebt.db.CharacteristicDto;
 import org.sonar.server.db.DbClient;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.NotFoundException;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.util.Validation;
 
 import javax.annotation.CheckForNull;
@@ -261,7 +261,7 @@ public class DebtModelOperations implements ServerComponent {
   }
 
   private void checkPermission() {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
   }
 
   private static DebtCharacteristic toCharacteristic(CharacteristicDto dto) {

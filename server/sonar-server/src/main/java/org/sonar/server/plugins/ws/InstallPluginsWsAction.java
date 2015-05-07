@@ -28,7 +28,7 @@ import org.sonar.api.server.ws.WebService;
 import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.server.plugins.PluginDownloader;
 import org.sonar.server.plugins.UpdateCenterMatrixFactory;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.updatecenter.common.PluginUpdate;
 
 import static java.lang.String.format;
@@ -67,7 +67,7 @@ public class InstallPluginsWsAction implements PluginsWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
     String key = request.mandatoryParam(PARAM_KEY);
     PluginUpdate pluginUpdate = findAvailablePluginByKey(key);
     pluginDownloader.download(key, pluginUpdate.getRelease().getVersion());

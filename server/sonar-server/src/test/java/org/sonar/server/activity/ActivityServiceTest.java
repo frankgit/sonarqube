@@ -22,6 +22,7 @@ package org.sonar.server.activity;
 import org.assertj.core.data.MapEntry;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.sonar.api.config.Settings;
 import org.sonar.api.utils.System2;
@@ -36,6 +37,7 @@ import org.sonar.server.issue.db.IssueDao;
 
 import java.util.List;
 import java.util.Map;
+import org.sonar.server.tester.UserSessionRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -49,6 +51,9 @@ public class ActivityServiceTest {
   @ClassRule
   public static EsTester es = new EsTester().addDefinitions(new ActivityIndexDefinition(new Settings()));
 
+  @Rule
+  public UserSessionRule userSession = new UserSessionRule();
+
   System2 system = mock(System2.class);
   ActivityService service;
 
@@ -60,7 +65,7 @@ public class ActivityServiceTest {
     ActivityIndexer indexer = new ActivityIndexer(dbClient, es.client());
     // indexers are disabled by default
     indexer.setEnabled(true);
-    service = new ActivityService(dbClient, indexer);
+    service = new ActivityService(dbClient, indexer, userSession);
   }
 
   @Test

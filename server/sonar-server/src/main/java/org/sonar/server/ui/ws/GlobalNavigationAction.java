@@ -32,6 +32,7 @@ import org.sonar.core.dashboard.ActiveDashboardDao;
 import org.sonar.core.dashboard.DashboardDto;
 import org.sonar.server.ui.ViewProxy;
 import org.sonar.server.ui.Views;
+import org.sonar.server.user.ThreadLocalUserSession;
 import org.sonar.server.user.UserSession;
 
 import java.util.List;
@@ -64,7 +65,7 @@ public class GlobalNavigationAction implements NavigationAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    UserSession userSession = UserSession.get();
+    UserSession userSession = userSession;
 
     List<DashboardDto> dashboards = activeDashboardDao.selectGlobalDashboardsForUserLogin(userSession.login());
     if (dashboards.isEmpty()) {

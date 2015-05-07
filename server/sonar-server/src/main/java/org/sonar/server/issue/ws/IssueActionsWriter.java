@@ -28,7 +28,7 @@ import org.sonar.api.web.UserRole;
 import org.sonar.core.issue.workflow.Transition;
 import org.sonar.server.issue.ActionService;
 import org.sonar.server.issue.IssueService;
-import org.sonar.server.user.UserSession;
+import org.sonar.server.user.ThreadLocalUserSession;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class IssueActionsWriter implements ServerComponent {
 
   public void writeTransitions(Issue issue, JsonWriter json) {
     json.name("transitions").beginArray();
-    if (UserSession.get().isLoggedIn()) {
+    if (userSession.isLoggedIn()) {
       for (Transition transition : issueService.listTransitions(issue)) {
         json.value(transition.key());
       }
@@ -64,7 +64,7 @@ public class IssueActionsWriter implements ServerComponent {
 
   private List<String> actions(Issue issue) {
     List<String> actions = newArrayList();
-    String login = UserSession.get().login();
+    String login = userSession.login();
     if (login != null) {
       actions.add("comment");
       if (issue.resolution() == null) {
@@ -75,7 +75,7 @@ public class IssueActionsWriter implements ServerComponent {
         }
         actions.add("plan");
         String projectUuid = issue.projectUuid();
-        if (projectUuid != null && UserSession.get().hasProjectPermissionByUuid(UserRole.ISSUE_ADMIN, projectUuid)) {
+        if (projectUuid != null && userSession.hasProjectPermissionByUuid(UserRole.ISSUE_ADMIN, projectUuid)) {
           actions.add("set_severity");
         }
         for (Action action : actionService.listAvailableActions(issue)) {
