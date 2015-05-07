@@ -19,14 +19,17 @@
  */
 package org.sonar.api.platform;
 
-import org.sonar.api.BatchComponent;
+import org.sonar.api.BatchSide;
 import org.sonar.api.Plugin;
-import org.sonar.api.ServerComponent;
+import org.sonar.api.ServerSide;
 
 import javax.annotation.CheckForNull;
+
 import java.util.Collection;
 
-public interface PluginRepository extends BatchComponent, ServerComponent {
+@BatchSide
+@ServerSide
+public interface PluginRepository {
   @CheckForNull
   Plugin getPlugin(String key);
 

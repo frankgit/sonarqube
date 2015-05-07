@@ -24,10 +24,11 @@ import com.google.common.collect.ListMultimap;
 import org.sonar.api.Extension;
 import org.sonar.api.ExtensionProvider;
 import org.sonar.api.Plugin;
-import org.sonar.api.ServerExtension;
+import org.sonar.api.ServerSide;
 import org.sonar.api.platform.ComponentContainer;
 import org.sonar.api.platform.PluginMetadata;
 import org.sonar.api.platform.PluginRepository;
+import org.sonar.api.utils.AnnotationUtils;
 
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class ServerExtensionInstaller {
   }
 
   Object installExtension(ComponentContainer container, PluginMetadata pluginMetadata, Object extension, boolean acceptProvider) {
-    if (isType(extension, ServerExtension.class)) {
+    if (AnnotationUtils.getAnnotation(extension, ServerSide.class) != null) {
       if (!acceptProvider && isExtensionProvider(extension)) {
         throw new IllegalStateException("ExtensionProvider can not include providers itself: " + extension);
       }

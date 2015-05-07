@@ -19,7 +19,7 @@
  */
 package org.sonar.batch.bootstrap;
 
-import org.sonar.api.BatchComponent;
+import org.sonar.api.BatchSide;
 import org.sonar.core.plugins.DefaultPluginMetadata;
 import org.sonar.core.plugins.PluginJarInstaller;
 import org.sonar.home.cache.FileCache;
@@ -27,7 +27,8 @@ import org.sonar.home.cache.FileCache;
 import java.io.File;
 import java.io.IOException;
 
-public class BatchPluginJarInstaller extends PluginJarInstaller implements BatchComponent {
+@BatchSide
+public class BatchPluginJarInstaller extends PluginJarInstaller {
 
   private FileCache cache;
 

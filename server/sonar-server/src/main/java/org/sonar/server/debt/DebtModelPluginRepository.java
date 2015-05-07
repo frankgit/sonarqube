@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.io.Charsets;
 import org.picocontainer.Startable;
 import org.sonar.api.Plugin;
-import org.sonar.api.ServerExtension;
+import org.sonar.api.ServerSide;
 import org.sonar.api.platform.PluginMetadata;
 import org.sonar.api.platform.PluginRepository;
 
@@ -45,7 +45,8 @@ import static com.google.common.collect.Lists.newArrayList;
  * they must be named "<pluginKey>-model.xml".
  * </p>
  */
-public class DebtModelPluginRepository implements ServerExtension, Startable {
+@ServerSide
+public class DebtModelPluginRepository implements Startable {
 
   public static final String DEFAULT_MODEL = "technical-debt";
 

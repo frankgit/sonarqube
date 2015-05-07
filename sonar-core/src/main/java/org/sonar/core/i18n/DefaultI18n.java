@@ -25,8 +25,8 @@ import org.apache.commons.io.IOUtils;
 import org.picocontainer.Startable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.BatchExtension;
-import org.sonar.api.ServerExtension;
+import org.sonar.api.BatchSide;
+import org.sonar.api.ServerSide;
 import org.sonar.api.i18n.I18n;
 import org.sonar.api.platform.PluginMetadata;
 import org.sonar.api.platform.PluginRepository;
@@ -42,9 +42,18 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Set;
 
-public class DefaultI18n implements I18n, ServerExtension, BatchExtension, Startable {
+@BatchSide
+@ServerSide
+public class DefaultI18n implements I18n, Startable {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultI18n.class);
 

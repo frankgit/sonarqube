@@ -20,18 +20,21 @@
 package org.sonar.core.plugins;
 
 import com.google.common.base.Function;
-import org.sonar.api.BatchComponent;
-import org.sonar.api.ServerComponent;
+import org.sonar.api.BatchSide;
+import org.sonar.api.ServerSide;
 import org.sonar.api.utils.SonarException;
 import org.sonar.updatecenter.common.PluginManifest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-public abstract class PluginJarInstaller implements BatchComponent, ServerComponent {
+@BatchSide
+@ServerSide
+public abstract class PluginJarInstaller {
 
   protected static final String FAIL_TO_INSTALL_PLUGIN = "Fail to install plugin: ";
 
